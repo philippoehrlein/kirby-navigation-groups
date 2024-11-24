@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'field.sidebarnavigation.group.name' => 'Group name',
-    'field.sidebarnavigation.group.sort' => 'Drag to sort …',
-    'field.sidebarnavigation.group.delete.confirm' => 'Are you sure you want to delete the group <strong>{name}</strong>?'
+    'field.navigationgroups.group.name' => 'Group name',
+    'field.navigationgroups.group.sort' => 'Drag to sort …',
+    'field.navigationgroups.group.delete.confirm' => 'Are you sure you want to delete the group <strong>{name}</strong>?'
 ];

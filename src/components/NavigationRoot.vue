@@ -11,19 +11,16 @@
     <k-empty v-if="!value.length" icon="page" :text="$t('pages.empty')" />
     <k-draggable
       :list="value"
+      class="k-draggable-container"
       :options="{ 
-        group: { 
-          name: 'root',
+        group: {
+          name: 'pages',
           pull: true,
-          put: (to, from) => {
-            return from.options.group.name === 'pages';
-          }
+          put: true
         },
         animation: 150
       }"
-      class="k-draggable-container"
-      @change="onDragChange"
-      @dragstart="onDragStart">
+      @change="onDragChange">
       <k-box v-for="(item, index) in value" :key="item.id">
         <GroupItem 
           v-if="item.type === 'group'" 
@@ -43,7 +40,7 @@ import PageItem from './PageItem.vue';
 import GroupItem from './GroupItem.vue';
 
 export default {
-  name: 'SidebarNavigation',
+  name: 'NavigationRoot',
   components: {
     PageItem,
     GroupItem
@@ -76,7 +73,7 @@ export default {
         props: {
           fields: {
             title: {
-              label: this.$t('field.sidebarnavigation.group.name'),
+              label: this.$t('field.navigationgroups.group.name'),
               required: true,
               type: 'text'
             }
@@ -114,7 +111,7 @@ export default {
         this.$panel.dialog.open({
           component: 'k-remove-dialog',
           props: {
-            text: this.$t('field.sidebarnavigation.group.delete.confirm', { name: group.text })
+            text: this.$t('field.navigationgroups.group.delete.confirm', { name: group.text })
           },
           on: {
             submit: () => {
@@ -141,7 +138,7 @@ export default {
       ));
     },
     async loadPages() {
-      const response = await this.$api.get(`sidebar-navigation/pages?path=${this.path}`);
+      const response = await this.$api.get(`navigation-groups/pages?path=${this.path}`);
       const newValue = [...this.value];
 
       for (let i = newValue.length - 1; i >= 0; i--) {
@@ -197,81 +194,41 @@ export default {
       };
       this.$emit('input', newValue);
     },
-    removePage(groupIndex, pageIndex) {
-      const newValue = [...this.value];
-      const page = newValue[groupIndex].pages.splice(pageIndex, 1)[0];
-      newValue.push(page);
-      this.$emit('input', newValue);
-    },
     onDragChange(evt) {
-      if (evt.removed) {
-        const { element } = evt.removed;
-        if (element && element.type === 'page') {
-          this.removeElementFromCurrentLocation(element);
-        }
+      if (evt.from === evt.to) {
+        this.$emit('input', this.value);
+        return;
       }
 
-      if (evt.added) {
-        const { element, newIndex } = evt.added;
-        const isInRoot = this.value.some(item => item.id === element.id);
-        if (element && element.type === 'page' && !isInRoot) {
-          this.addElementToNewLocation(element, newIndex);
-        }
-      }
+      const movedItem = evt.item.__vue__.$props.item;
+      const newValue = [...this.value];
 
-      this.$emit('input', this.value);
-    },
-    removeElementFromCurrentLocation(element) {
-      const index = this.value.findIndex(item => item.id === element.id);
-      if (index !== -1) {
-        this.value.splice(index, 1);
-      }
-    },
-    addElementToNewLocation(element, newIndex) {
-      this.value.splice(newIndex, 0, element);
-    },
-    onDragStart(evt) {
-      // Speichere das aktuelle Element und seine Position
-      this.draggedElement = evt.item.__vue__.$children[0].item;
-      this.isDragging = true;
-      this.trackMousePosition();
-    },
-
-    trackMousePosition() {
-      window.addEventListener('mousemove', this.handleMouseMove);
-      window.addEventListener('mouseup', this.stopTracking);
-    },
-
-    handleMouseMove(evt) {
-      if (!this.isDragging) return;
-      
-      const groupEl = document.elementFromPoint(evt.clientX, evt.clientY)
-        ?.closest('.k-sidebar-group');
-            
-      if (groupEl) {
-        const groupComponent = groupEl.__vue__;
+      if (!evt.from.classList.contains('k-draggable-group') && 
+          evt.to.classList.contains('k-draggable-group')) {
         
-        if (groupComponent && groupComponent.value.type === 'group') {
-          this.$refs.rootDraggable.dragCancel();
-          
-          // Füge Element zur Gruppe hinzu
-          this.moveElementToGroup(this.draggedElement, groupComponent.value);
-          
-          // Starte neuen Drag in Gruppe
-          this.$nextTick(() => {
-            const pageEl = groupEl.querySelector(`[data-id="${this.draggedElement.id}"]`);
-            if (pageEl) {
-              pageEl.__vue__.$refs.draggable.dragStart(evt);
-            }
-          });
+        // Finde die Zielgruppe
+        const targetGroupIndex = newValue.findIndex(item => 
+          item.type === 'group' && 
+          item.pages === evt.to.__vue__.$props.list
+        );
+
+        if (targetGroupIndex !== -1) {
+          // Entferne das Element aus Root
+          const rootItemIndex = newValue.findIndex(item => item.uuid === movedItem.uuid);
+          if (rootItemIndex !== -1) {
+            newValue.splice(rootItemIndex, 1);
+          }
+
+          // Füge das Element zur Zielgruppe hinzu
+          const pageItem = {
+            type: 'page',
+            ...movedItem
+          };
+          newValue[targetGroupIndex].pages.splice(evt.newIndex, 0, pageItem);
         }
       }
-    },
 
-    stopTracking() {
-      this.isDragging = false;
-      window.removeEventListener('mousemove', this.handleMouseMove);
-      window.removeEventListener('mouseup', this.stopTracking);
+      this.$emit('input', newValue);
     }
   },
   created() {

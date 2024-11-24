@@ -5,7 +5,7 @@ use Kirby\Data\Yaml;
 
 Kirby::plugin('philippoehrlein/kirby-navigation-groups', [
   'fields' => [
-    'navigationGroups' => [
+    'navigationgroups' => [
       'props' => [
         'label' => function () {
           return $this->label();

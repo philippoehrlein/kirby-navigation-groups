@@ -20,7 +20,7 @@
 
 <script>
 export default {
-  name: 'SidebarPageItem',
+  name: 'NavigationPageItem',
   props: {
     item: {
       type: Object,

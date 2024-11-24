@@ -3,7 +3,7 @@
 return [
   'routes' => [
       [
-        'pattern' => 'sidebar-navigation/pages',
+        'pattern' => 'navigation-groups/pages',
         'method' => 'GET',
         'action' => function () {
           $path = get('path');
