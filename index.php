@@ -1,13 +1,15 @@
 <?php
 
 use Kirby\Cms\App as Kirby;
-use Kirby\Cms\Page;
 use Kirby\Data\Yaml;
 
-Kirby::plugin('philippoehrlein/kirby-sidebar-navigation', [
+Kirby::plugin('philippoehrlein/kirby-navigation-groups', [
   'fields' => [
-    'sidebarnavigation' => [
+    'navigationGroups' => [
       'props' => [
+        'label' => function () {
+          return $this->label();
+        },
         'value' => function ($value = null) {
           return Yaml::decode($value);
         },
@@ -20,30 +22,6 @@ Kirby::plugin('philippoehrlein/kirby-sidebar-navigation', [
       },
     ],
   ],
-  'api' => [
-    'routes' => [
-      [
-        'pattern' => 'sidebar-navigation/pages',
-        'method' => 'GET',
-        'action' => function () {
-          $path = get('path');
-          $page = kirby()->page($path);
-          $children = $page->children()->listed();
-          
-          $result = [];
-          foreach($children as $child) {
-            $result[] = [
-              'id' => $child->id(),
-              'title' => $child->title()->value(),
-              'uuid' => $child->uuid()->value(),
-              'path' => $child->id(),
-              'status' => $child->status(),
-              'permissions' => $child->permissions()
-            ];
-          }
-          return $result;
-        }
-      ]
-    ]
-  ]
+  'api' => require __DIR__ . '/config/api.php',
+  'translations' => require __DIR__ . '/config/translations.php'
 ]);

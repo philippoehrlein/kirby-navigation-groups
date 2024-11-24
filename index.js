@@ -45,20 +45,26 @@
     _sfc_staticRenderFns$2,
     false,
     null,
-    "fab84231"
+    "52320cd5"
   );
-  __component__$2.options.__file = "/Users/philipp/Documents/02_Offen/Kirby Plugins/email-manager-landing/site/plugins/kirby-sidebar-navigation/src/components/SidebarPageItem.vue";
-  const SidebarPageItem = __component__$2.exports;
+  __component__$2.options.__file = "/Users/philipp/Documents/02_Offen/Kirby Plugins/email-manager-landing/site/plugins/kirby-sidebar-navigation/src/components/PageItem.vue";
+  const PageItem = __component__$2.exports;
   const _sfc_main$1 = {
     name: "SidebarGroup",
     components: {
-      SidebarPageItem
+      PageItem
     },
     props: {
       value: {
         type: Object,
         required: true
       }
+    },
+    data() {
+      return {
+        draggedElement: null,
+        isDragging: false
+      };
     },
     methods: {
       onDragChange(evt) {
@@ -93,32 +99,67 @@
         this.value.pages.splice(newIndex, 0, page);
       },
       onGroupOption(evt) {
-        console.log(evt);
         if (evt === "edit") {
           this.$emit("edit");
         } else if (evt === "delete") {
           this.$emit("delete");
         }
+      },
+      onDragStart(evt) {
+        this.draggedElement = evt.item.__vue__.$children[0].item;
+        this.isDragging = true;
+        this.trackMousePosition();
+      },
+      trackMousePosition() {
+        window.addEventListener("mousemove", this.handleMouseMove);
+        window.addEventListener("mouseup", this.stopTracking);
+      },
+      handleMouseMove(evt) {
+        if (!this.isDragging) return;
+        const elementUnderMouse = document.elementFromPoint(evt.clientX, evt.clientY);
+        const isOverRoot = elementUnderMouse == null ? void 0 : elementUnderMouse.closest(".k-draggable-container");
+        if (isOverRoot && !(elementUnderMouse == null ? void 0 : elementUnderMouse.closest(".k-sidebar-group"))) {
+          this.$refs.groupDraggable.$el.dispatchEvent(new MouseEvent("mouseup"));
+          this.$emit("moveToRoot", this.draggedElement);
+          this.$nextTick(() => {
+            const pageEl = isOverRoot.querySelector(`[data-id="${this.draggedElement.id}"]`);
+            if (pageEl) {
+              const event = new MouseEvent("mousedown", {
+                clientX: evt.clientX,
+                clientY: evt.clientY
+              });
+              pageEl.dispatchEvent(event);
+            }
+          });
+        }
+      },
+      stopTracking() {
+        this.isDragging = false;
+        this.draggedElement = null;
+        window.removeEventListener("mousemove", this.handleMouseMove);
+        window.removeEventListener("mouseup", this.stopTracking);
       }
-    },
-    mounted() {
-      console.log(this.value);
     }
   };
   var _sfc_render$1 = function render() {
     var _vm = this, _c = _vm._self._c;
-    return _c("div", { staticClass: "k-sidebar-group" }, [_c("header", { staticClass: "k-sidebar-group-header" }, [_c("div", { staticClass: "k-sidebar-group-header-title" }, [_c("button", { staticClass: "k-button k-sort-handle k-sort-button k-item-sort-handle", attrs: { "data-has-icon": "true", "aria-label": "Bewegen um zu sortieren …", "title": "Bewegen um zu sortieren …", "type": "button", "tabindex": "-1" } }, [_c("span", { staticClass: "k-button-icon" }, [_c("svg", { staticClass: "k-icon", attrs: { "aria-hidden": "true", "data-type": "sort" } }, [_c("use", { attrs: { "xlink:href": "#icon-sort" } })])])]), _c("h3", [_vm._v(_vm._s(_vm.value.text))])]), _c("div", { staticClass: "k-sidebar-group-header-options" }, [_c("k-options-dropdown", { attrs: { "options": [{ text: _vm.$t("edit"), icon: "edit", click: "edit" }, { text: _vm.$t("delete"), icon: "trash", click: "delete" }] }, on: { "action": function($event) {
+    return _c("div", { staticClass: "k-sidebar-group" }, [_c("header", { staticClass: "k-sidebar-group-header" }, [_c("div", { staticClass: "k-sidebar-group-header-title" }, [_c("button", { staticClass: "k-button k-sort-handle k-sort-button k-item-sort-handle", attrs: { "data-has-icon": "true", "aria-label": _vm.$t("field.sidebarnavigation.group.sort"), "title": _vm.$t("field.sidebarnavigation.group.sort"), "type": "button", "tabindex": "-1" } }, [_c("span", { staticClass: "k-button-icon" }, [_c("svg", { staticClass: "k-icon", attrs: { "aria-hidden": "true", "data-type": "sort" } }, [_c("use", { attrs: { "xlink:href": "#icon-sort" } })])])]), _c("h3", [_vm._v(_vm._s(_vm.value.text))])]), _c("div", { staticClass: "k-sidebar-group-header-options" }, [_c("k-options-dropdown", { attrs: { "options": [
+      { text: _vm.$t("edit"), icon: "edit", click: "edit" },
+      { text: _vm.$t("delete"), icon: "trash", click: "delete" }
+    ] }, on: { "action": function($event) {
       return _vm.onGroupOption($event);
-    } } })], 1)]), _c("k-draggable", { staticClass: "k-draggable-group", class: { "k-empty": !_vm.value.pages.length }, attrs: { "list": _vm.value.pages, "animation": 150, "options": {
+    } } })], 1)]), _c("k-draggable", { ref: "groupDraggable", staticClass: "k-draggable-group", class: { "k-empty": !_vm.value.pages.length }, attrs: { "list": _vm.value.pages, "options": {
       group: {
         name: "pages",
         pull: true,
         put: (to, from, dragEl) => {
-          return dragEl.__vue__ && dragEl.__vue__.$children[0].$options.name === "SidebarPageItem";
+          const isPageItem = dragEl.__vue__ && dragEl.__vue__.$children[0].$options.name === "PageItem";
+          return isPageItem;
         }
-      }
-    } }, on: { "change": _vm.onDragChange } }, _vm._l(_vm.value.pages, function(page) {
-      return _c("k-box", { key: page.id }, [_c("SidebarPageItem", { attrs: { "item": page } })], 1);
+      },
+      animation: 150
+    } }, on: { "change": _vm.onDragChange, "dragstart": _vm.onDragStart } }, _vm._l(_vm.value.pages, function(page) {
+      return _c("k-box", { key: page.id }, [_c("PageItem", { attrs: { "item": page } })], 1);
     }), 1), _c("footer", { staticClass: "k-sidebar-group-footer" })], 1);
   };
   var _sfc_staticRenderFns$1 = [];
@@ -129,15 +170,15 @@
     _sfc_staticRenderFns$1,
     false,
     null,
-    "39a06387"
+    "aaefb2ee"
   );
-  __component__$1.options.__file = "/Users/philipp/Documents/02_Offen/Kirby Plugins/email-manager-landing/site/plugins/kirby-sidebar-navigation/src/components/SidebarGroup.vue";
-  const SidebarGroup = __component__$1.exports;
+  __component__$1.options.__file = "/Users/philipp/Documents/02_Offen/Kirby Plugins/email-manager-landing/site/plugins/kirby-sidebar-navigation/src/components/GroupItem.vue";
+  const GroupItem = __component__$1.exports;
   const _sfc_main = {
     name: "SidebarNavigation",
     components: {
-      SidebarPageItem,
-      SidebarGroup
+      PageItem,
+      GroupItem
     },
     props: {
       value: {
@@ -147,68 +188,65 @@
       path: {
         type: String,
         required: true
+      },
+      label: {
+        type: String,
+        required: true
       }
     },
     data() {
       return {
-        pages: this.value || []
+        pages: this.value || [],
+        draggedElement: null,
+        isDragging: false
       };
     },
     methods: {
-      addGroup() {
+      openDialog(option, group) {
         this.$panel.dialog.open({
           component: "k-form-dialog",
           props: {
             fields: {
               title: {
-                label: "Name der Gruppe",
+                label: this.$t("field.sidebarnavigation.group.name"),
+                required: true,
                 type: "text"
               }
+            },
+            value: {
+              title: option === "add" ? "" : group.text
             }
           },
           on: {
             submit: (value) => {
-              this.$emit("input", [...this.value, {
-                uuid: this.$helper.string.uuid(),
-                type: "group",
-                text: value.title,
-                pages: []
-              }]);
+              if (option === "add") {
+                this.$emit("input", [...this.value, {
+                  uuid: this.$helper.string.uuid(),
+                  type: "group",
+                  text: value.title,
+                  pages: []
+                }]);
+              } else {
+                this.$emit("input", this.value.map(
+                  (item) => item.uuid === group.uuid ? { ...item, text: value.title } : item
+                ));
+              }
               this.$panel.dialog.close();
             }
           }
         });
       },
+      addGroup() {
+        this.openDialog("add");
+      },
       onGroupOption(option, group) {
-        console.log(group);
         if (option === "edit") {
-          this.$panel.dialog.open({
-            component: "k-form-dialog",
-            props: {
-              fields: {
-                title: {
-                  label: "Name der Gruppe",
-                  type: "text"
-                }
-              },
-              value: {
-                title: group.text
-              }
-            },
-            on: {
-              submit: (value) => {
-                this.$emit("input", this.value.map(
-                  (item) => item.uuid === group.uuid ? { ...item, text: value.title } : item
-                ));
-                this.$panel.dialog.close();
-              }
-            }
-          });
-        } else if (option === "delete") {
+          this.openDialog("edit", group);
+        } else {
           this.$panel.dialog.open({
             component: "k-remove-dialog",
             props: {
-              text: `Willst du die Gruppe <strong>${group.text}</strong> wirklich löschen?`
+              text: this.$t("field.sidebarnavigation.group.delete.confirm", { name: group.text })
             },
             on: {
               submit: () => {
@@ -239,7 +277,6 @@
         const newValue = [...this.value];
         for (let i = newValue.length - 1; i >= 0; i--) {
           const item = newValue[i];
-          console.log(item);
           if (item.type === "page") {
             const pageExists = response.some((page) => page.id === item.id);
             if (!pageExists) {
@@ -315,6 +352,38 @@
       },
       addElementToNewLocation(element, newIndex) {
         this.value.splice(newIndex, 0, element);
+      },
+      onDragStart(evt) {
+        this.draggedElement = evt.item.__vue__.$children[0].item;
+        this.isDragging = true;
+        this.trackMousePosition();
+      },
+      trackMousePosition() {
+        window.addEventListener("mousemove", this.handleMouseMove);
+        window.addEventListener("mouseup", this.stopTracking);
+      },
+      handleMouseMove(evt) {
+        var _a;
+        if (!this.isDragging) return;
+        const groupEl = (_a = document.elementFromPoint(evt.clientX, evt.clientY)) == null ? void 0 : _a.closest(".k-sidebar-group");
+        if (groupEl) {
+          const groupComponent = groupEl.__vue__;
+          if (groupComponent && groupComponent.value.type === "group") {
+            this.$refs.rootDraggable.dragCancel();
+            this.moveElementToGroup(this.draggedElement, groupComponent.value);
+            this.$nextTick(() => {
+              const pageEl = groupEl.querySelector(`[data-id="${this.draggedElement.id}"]`);
+              if (pageEl) {
+                pageEl.__vue__.$refs.draggable.dragStart(evt);
+              }
+            });
+          }
+        }
+      },
+      stopTracking() {
+        this.isDragging = false;
+        window.removeEventListener("mousemove", this.handleMouseMove);
+        window.removeEventListener("mouseup", this.stopTracking);
       }
     },
     created() {
@@ -323,26 +392,26 @@
   };
   var _sfc_render = function render() {
     var _vm = this, _c = _vm._self._c;
-    return _c("section", { staticClass: "k-section" }, [_c("header", { staticClass: "k-section-header" }, [_vm._m(0), _c("div", { staticClass: "k-button-group k-section-buttons" }, [_c("k-button", { attrs: { "variant": "filled", "size": "xs", "icon": "addgroup" }, on: { "click": _vm.addGroup } })], 1)]), !_vm.value.length ? _c("k-empty", { attrs: { "icon": "page", "text": _vm.$t("pages.empty") } }) : _vm._e(), _c("k-draggable", { staticClass: "k-draggable-container", attrs: { "list": _vm.value, "animation": 150, "options": {
+    return _c("section", { staticClass: "k-section" }, [_c("header", { staticClass: "k-section-header" }, [_c("h2", { staticClass: "k-label k-section-label" }, [_c("span", { staticClass: "k-label-text" }, [_vm._v(_vm._s(_vm.label))])]), _c("div", { staticClass: "k-button-group k-section-buttons" }, [_c("k-button", { attrs: { "variant": "filled", "size": "xs", "icon": "addgroup" }, on: { "click": _vm.addGroup } })], 1)]), !_vm.value.length ? _c("k-empty", { attrs: { "icon": "page", "text": _vm.$t("pages.empty") } }) : _vm._e(), _c("k-draggable", { staticClass: "k-draggable-container", attrs: { "list": _vm.value, "options": {
       group: {
         name: "root",
         pull: true,
-        put: ["pages"]
-      }
-    } }, on: { "change": _vm.onDragChange } }, _vm._l(_vm.value, function(item, index) {
-      return _c("k-box", { key: item.id }, [item.type === "group" ? _c("SidebarGroup", { attrs: { "value": item }, on: { "input": function($event) {
+        put: (to, from) => {
+          return from.options.group.name === "pages";
+        }
+      },
+      animation: 150
+    } }, on: { "change": _vm.onDragChange, "dragstart": _vm.onDragStart } }, _vm._l(_vm.value, function(item, index) {
+      return _c("k-box", { key: item.id }, [item.type === "group" ? _c("GroupItem", { attrs: { "value": item }, on: { "input": function($event) {
         return _vm.updateGroup(index, $event);
       }, "edit": function($event) {
         return _vm.onGroupOption("edit", item);
       }, "delete": function($event) {
         return _vm.onGroupOption("delete", item);
-      } } }) : _c("SidebarPageItem", { attrs: { "item": item } })], 1);
+      } } }) : _c("PageItem", { attrs: { "item": item } })], 1);
     }), 1)], 1);
   };
-  var _sfc_staticRenderFns = [function() {
-    var _vm = this, _c = _vm._self._c;
-    return _c("h2", { staticClass: "k-label k-section-label" }, [_c("span", { staticClass: "k-label-text" }, [_vm._v("Navigation")])]);
-  }];
+  var _sfc_staticRenderFns = [];
   _sfc_render._withStripped = true;
   var __component__ = /* @__PURE__ */ normalizeComponent(
     _sfc_main,
@@ -350,17 +419,16 @@
     _sfc_staticRenderFns,
     false,
     null,
-    "f00dcdf4"
+    "099cc128"
   );
-  __component__.options.__file = "/Users/philipp/Documents/02_Offen/Kirby Plugins/email-manager-landing/site/plugins/kirby-sidebar-navigation/src/components/SidebarNavigation.vue";
-  const SidebarNavigation = __component__.exports;
-  panel.plugin("philippoehrlein/kirby-sidebar-navigation", {
+  __component__.options.__file = "/Users/philipp/Documents/02_Offen/Kirby Plugins/email-manager-landing/site/plugins/kirby-sidebar-navigation/src/components/NavigationRoot.vue";
+  const NavigationRoot = __component__.exports;
+  panel.plugin("philippoehrlein/kirby-navigation-groups", {
     icons: {
-      "seperator": '<path d="M2 11H4V13H2V11ZM6 11H18V13H6V11ZM20 11H22V13H20V11Z"></path>',
       "addgroup": '<path d="M12.4142 5H21C21.5523 5 22 5.44772 22 6V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H10.4142L12.4142 5ZM4 5V19H20V7H11.5858L9.58579 5H4ZM11 12V9H13V12H16V14H13V17H11V14H8V12H11Z"></path>'
     },
     fields: {
-      sidebarnavigation: SidebarNavigation
+      navigaionGroups: NavigationRoot
     }
   });
 })();

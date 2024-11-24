@@ -2,30 +2,53 @@
   <div class="k-sidebar-group">
     <header class="k-sidebar-group-header">
       <div class="k-sidebar-group-header-title">
-        <button data-has-icon="true" aria-label="Bewegen um zu sortieren …" title="Bewegen um zu sortieren …" type="button" class="k-button k-sort-handle k-sort-button k-item-sort-handle" tabindex="-1"><span class="k-button-icon"><svg aria-hidden="true" data-type="sort" class="k-icon"><use xlink:href="#icon-sort"></use></svg></span><!----><!----></button>
+        <button 
+          data-has-icon="true" 
+          :aria-label="$t('field.sidebarnavigation.group.sort')" 
+          :title="$t('field.sidebarnavigation.group.sort')" 
+          type="button" 
+          class="k-button k-sort-handle k-sort-button k-item-sort-handle" 
+          tabindex="-1"
+        >
+          <span class="k-button-icon">
+            <svg aria-hidden="true" data-type="sort" class="k-icon">
+              <use xlink:href="#icon-sort"></use>
+            </svg>
+          </span>
+        </button>
         <h3>{{ value.text }}</h3>
       </div>
       <div class="k-sidebar-group-header-options">
-        <k-options-dropdown :options="[{ text: $t('edit'), icon: 'edit', click: 'edit' }, { text: $t('delete'), icon: 'trash', click: 'delete' }]" @action="onGroupOption($event)" />
+        <k-options-dropdown 
+          :options="[
+            { text: $t('edit'), icon: 'edit', click: 'edit' }, 
+            { text: $t('delete'), icon: 'trash', click: 'delete' }
+          ]" 
+          @action="onGroupOption($event)" 
+        />
       </div>
     </header>
     <k-draggable 
+      ref="groupDraggable"
       :list="value.pages" 
       :class="{ 'k-empty': !value.pages.length }"
-      :animation="150"
       :options="{ 
         group: { 
           name: 'pages',
           pull: true,
           put: (to, from, dragEl) => {
-            return dragEl.__vue__ && dragEl.__vue__.$children[0].$options.name === 'SidebarPageItem';
+            const isPageItem = dragEl.__vue__ && 
+              dragEl.__vue__.$children[0].$options.name === 'PageItem';
+            return isPageItem;
           }
-        } 
+        },
+        animation: 150
       }"
       class="k-draggable-group"
-      @change="onDragChange">
+      @change="onDragChange"
+      @dragstart="onDragStart">
       <k-box v-for="page in value.pages" :key="page.id">
-        <SidebarPageItem :item="page" />
+        <PageItem :item="page" />
       </k-box>
     </k-draggable>
     <footer class="k-sidebar-group-footer">
@@ -35,17 +58,23 @@
 </template>
 
 <script>
-import SidebarPageItem from './SidebarPageItem.vue';
+import PageItem from './PageItem.vue';
 
 export default {
   name: 'SidebarGroup',
   components: {
-    SidebarPageItem
+    PageItem
   },
   props: {
     value: {
       type: Object,
       required: true
+    }
+  },
+  data() {
+    return {
+      draggedElement: null,
+      isDragging: false
     }
   },
   methods: {
@@ -83,16 +112,52 @@ export default {
       this.value.pages.splice(newIndex, 0, page);
     },
     onGroupOption(evt) {
-      console.log(evt);
       if(evt === 'edit') {
         this.$emit('edit');
       } else if (evt === 'delete') {
         this.$emit('delete');
       }
+    },
+    onDragStart(evt) {
+      this.draggedElement = evt.item.__vue__.$children[0].item;
+      this.isDragging = true;
+      this.trackMousePosition();
+    },
+    trackMousePosition() {
+      window.addEventListener('mousemove', this.handleMouseMove);
+      window.addEventListener('mouseup', this.stopTracking);
+    },
+    handleMouseMove(evt) {
+      if (!this.isDragging) return;
+      
+      const elementUnderMouse = document.elementFromPoint(evt.clientX, evt.clientY);
+      const isOverRoot = elementUnderMouse?.closest('.k-draggable-container');
+      
+      if (isOverRoot && !elementUnderMouse?.closest('.k-sidebar-group')) {
+        this.$refs.groupDraggable.$el.dispatchEvent(new MouseEvent('mouseup'));
+        
+        // Verschiebe Element ins Root
+        this.$emit('moveToRoot', this.draggedElement);
+        
+        // Starte neuen Drag im Root
+        this.$nextTick(() => {
+          const pageEl = isOverRoot.querySelector(`[data-id="${this.draggedElement.id}"]`);
+          if (pageEl) {
+            const event = new MouseEvent('mousedown', {
+              clientX: evt.clientX,
+              clientY: evt.clientY
+            });
+            pageEl.dispatchEvent(event);
+          }
+        });
+      }
+    },
+    stopTracking() {
+      this.isDragging = false;
+      this.draggedElement = null;
+      window.removeEventListener('mousemove', this.handleMouseMove);
+      window.removeEventListener('mouseup', this.stopTracking);
     }
-  },
-  mounted() {
-    console.log(this.value);
   }
 }
 </script>
@@ -138,7 +203,6 @@ export default {
   padding: var(--spacing-2) var(--spacing-1);
 }
 .k-empty {
-  pointer-events: none;
   height: 40px;
   background-color: var(--color-gray-100);
 }
