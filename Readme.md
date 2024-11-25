@@ -93,16 +93,14 @@ $items = $page->sidebarnavigation()->toGroupItems();
 </nav>
 ```
 
+## Development
 
-## Requirements
+If you want to contribute to the development of this plugin, follow these steps:
 
-- Kirby 4.0+
-- PHP 8.0+
+1. Clone the repository.
+2. Install dependencies using Composer.
+3. Make your changes and test them in your Kirby installation.
 
 ## License
 
-MIT
-
-## Credits
-
-- [Philipp Oehrlein](https://github.com/philippoehrlein)
+This plugin is open-source and available under the [MIT License](LICENSE.md).
