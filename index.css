@@ -2,6 +2,12 @@
 .k-draggable-item[data-v-52320cd5] {
   width: 100%;
 }
+.k-status-icon[data-v-52320cd5] {
+  --icon-size: 15px;
+}
+.k-frame.k-icon-frame.k-item-image svg[data-v-52320cd5] {
+  color: var(--color-grey-500);
+}
 
 .k-navigation-group[data-v-aaefb2ee] {
   width: 100%;

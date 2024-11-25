@@ -1,0 +1,25 @@
+title: Page
+icon: page
+
+columns:
+  main:
+    width: 3/4
+    fields:
+      article:
+        label: Article
+        type: writer
+        required: true
+  sidebar:
+    width: 1/4
+    sections:
+      drafts:
+        label: Drafts
+        type: pages
+        status: draft
+      published:
+        type: fields
+        fields:
+          sidebarnavigation:
+            label: Sidebar Navigation
+            type: navigationgroups
+            status: published

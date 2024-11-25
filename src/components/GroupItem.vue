@@ -16,7 +16,7 @@
             </svg>
           </span>
         </button>
-        <h3>{{ value.text }}</h3>
+        <h3>{{ value.title }}</h3>
       </div>
       <div class="k-navigation-group-header-options">
         <k-options-dropdown 
@@ -74,6 +74,10 @@ export default {
     value: {
       type: Object,
       required: true
+    },
+    fields: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -88,6 +92,9 @@ export default {
         ...this.value,
         pages: this.value.pages
       });
+    },
+    onGroupOption(action) {
+      this.$emit(action);
     }
   }
 }

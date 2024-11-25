@@ -26,16 +26,22 @@
     methods: {
       handleStatusClick(item) {
         this.$dialog(`pages/${item.path}/changeStatus`);
+      },
+      getIconColor(status) {
+        console.log(status);
+        return status === "listed" ? "color: var(--color-green-500)" : "color: var(--color-blue-500)";
       }
     }
   };
   var _sfc_render$2 = function render() {
     var _vm = this, _c = _vm._self._c;
-    return _vm.item.type === "page" ? _c("k-item", { staticClass: "k-draggable-item", attrs: { "sortable": _vm.item.sortable, "text": _vm.item.text, "link": "pages/" + _vm.item.path, "image": { "back": "pattern", color: "white", "icon": "page" } }, scopedSlots: _vm._u([{ key: "options", fn: function() {
-      return [_c("k-button", { staticClass: "k-button k-status-icon", staticStyle: { "--icon-size": "15px", "color": "var(--color-green-500)" }, attrs: { "icon": "status-listed", "data-type": "status-listed", "data-theme": "positive-icon" }, on: { "click": function($event) {
+    return _vm.item.type === "page" ? _c("k-item", { staticClass: "k-draggable-item", attrs: { "sortable": _vm.item.sortable, "text": _vm.item.text, "link": "pages/" + _vm.item.path, "image": { "back": "pattern", color: "gray-500", "icon": "page" } }, scopedSlots: _vm._u([{ key: "drag", fn: function() {
+      return [_vm.item.sortable ? _c("k-drag-handle") : _vm._e()];
+    }, proxy: true }, { key: "options", fn: function() {
+      return [_c("k-button", { staticClass: "k-button k-status-icon", style: _vm.getIconColor(_vm.item.flag.status), attrs: { "icon": "status-" + _vm.item.flag.status, "data-type": "status-" + _vm.item.flag.status, "data-theme": _vm.item.flag.status === "listed" ? "positive-icon" : "info-icon" }, on: { "click": function($event) {
         return _vm.handleStatusClick(_vm.item);
       } } })];
-    }, proxy: true }], null, false, 1890145663) }) : _vm._e();
+    }, proxy: true }], null, false, 2125919631) }) : _vm._e();
   };
   var _sfc_staticRenderFns$2 = [];
   _sfc_render$2._withStripped = true;
@@ -58,6 +64,10 @@
       value: {
         type: Object,
         required: true
+      },
+      fields: {
+        type: Object,
+        default: () => ({})
       }
     },
     data() {
@@ -72,12 +82,15 @@
           ...this.value,
           pages: this.value.pages
         });
+      },
+      onGroupOption(action) {
+        this.$emit(action);
       }
     }
   };
   var _sfc_render$1 = function render() {
     var _vm = this, _c = _vm._self._c;
-    return _c("div", { staticClass: "k-navigation-group" }, [_c("header", { staticClass: "k-navigation-group-header" }, [_c("div", { staticClass: "k-navigation-group-header-title" }, [_c("button", { staticClass: "k-button k-sort-handle k-sort-button k-item-sort-handle", attrs: { "data-has-icon": "true", "aria-label": _vm.$t("field.navigationgroups.group.sort"), "title": _vm.$t("field.navigationgroups.group.sort"), "type": "button", "tabindex": "-1" } }, [_c("span", { staticClass: "k-button-icon" }, [_c("svg", { staticClass: "k-icon", attrs: { "aria-hidden": "true", "data-type": "sort" } }, [_c("use", { attrs: { "xlink:href": "#icon-sort" } })])])]), _c("h3", [_vm._v(_vm._s(_vm.value.text))])]), _c("div", { staticClass: "k-navigation-group-header-options" }, [_c("k-options-dropdown", { attrs: { "options": [
+    return _c("div", { staticClass: "k-navigation-group" }, [_c("header", { staticClass: "k-navigation-group-header" }, [_c("div", { staticClass: "k-navigation-group-header-title" }, [_c("button", { staticClass: "k-button k-sort-handle k-sort-button k-item-sort-handle", attrs: { "data-has-icon": "true", "aria-label": _vm.$t("field.navigationgroups.group.sort"), "title": _vm.$t("field.navigationgroups.group.sort"), "type": "button", "tabindex": "-1" } }, [_c("span", { staticClass: "k-button-icon" }, [_c("svg", { staticClass: "k-icon", attrs: { "aria-hidden": "true", "data-type": "sort" } }, [_c("use", { attrs: { "xlink:href": "#icon-sort" } })])])]), _c("h3", [_vm._v(_vm._s(_vm.value.title))])]), _c("div", { staticClass: "k-navigation-group-header-options" }, [_c("k-options-dropdown", { attrs: { "options": [
       { text: _vm.$t("edit"), icon: "edit", click: "edit" },
       { text: _vm.$t("delete"), icon: "trash", click: "delete" }
     ] }, on: { "action": function($event) {
@@ -127,6 +140,15 @@
       label: {
         type: String,
         required: true
+      },
+      fields: {
+        type: Object,
+        default: () => {
+        }
+      },
+      status: {
+        type: String,
+        default: "listed"
       }
     },
     data() {
@@ -138,18 +160,14 @@
     },
     methods: {
       openDialog(option, group) {
+        const fields = this.fields || {};
         this.$panel.dialog.open({
           component: "k-form-dialog",
           props: {
-            fields: {
-              title: {
-                label: this.$t("field.navigationgroups.group.name"),
-                required: true,
-                type: "text"
-              }
-            },
-            value: {
-              title: option === "add" ? "" : group.text
+            fields,
+            value: option === "add" ? {} : {
+              title: group.title,
+              ...group
             }
           },
           on: {
@@ -158,12 +176,16 @@
                 this.$emit("input", [...this.value, {
                   uuid: this.$helper.string.uuid(),
                   type: "group",
-                  text: value.title,
+                  title: value.title,
+                  ...value,
                   pages: []
                 }]);
               } else {
                 this.$emit("input", this.value.map(
-                  (item) => item.uuid === group.uuid ? { ...item, text: value.title } : item
+                  (item) => item.uuid === group.uuid ? {
+                    ...item,
+                    ...value
+                  } : item
                 ));
               }
               this.$panel.dialog.close();
@@ -208,7 +230,7 @@
         ));
       },
       async loadPages() {
-        const response = await this.$api.get(`navigation-groups/pages?path=${this.path}`);
+        const response = await this.$api.get(`navigation-groups/pages?path=${this.path}&status=${this.status}`);
         const newValue = [...this.value];
         for (let i = newValue.length - 1; i >= 0; i--) {
           const item = newValue[i];
@@ -297,7 +319,7 @@
       },
       animation: 150
     } }, on: { "change": _vm.onDragChange } }, _vm._l(_vm.value, function(item, index) {
-      return _c("k-box", { key: item.id }, [item.type === "group" ? _c("GroupItem", { attrs: { "value": item }, on: { "input": function($event) {
+      return _c("k-box", { key: item.id }, [item.type === "group" ? _c("GroupItem", { attrs: { "value": item, "fields": _vm.fields }, on: { "input": function($event) {
         return _vm.updateGroup(index, $event);
       }, "edit": function($event) {
         return _vm.onGroupOption("edit", item);
@@ -320,7 +342,7 @@
   const NavigationRoot = __component__.exports;
   panel.plugin("philippoehrlein/kirby-navigation-groups", {
     icons: {
-      "addgroup": '<path d="M12.4142 5H21C21.5523 5 22 5.44772 22 6V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H10.4142L12.4142 5ZM4 5V19H20V7H11.5858L9.58579 5H4ZM11 12V9H13V12H16V14H13V17H11V14H8V12H11Z"></path>'
+      "addgroup": '<path d="M4 3H20C20.5523 3 21 3.44772 21 4V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V4C3 3.44772 3.44772 3 4 3ZM5 5V19H19V5H5ZM11 11V7H13V11H17V13H13V17H11V13H7V11H11Z"></path>'
     },
     fields: {
       navigationgroups: NavigationRoot

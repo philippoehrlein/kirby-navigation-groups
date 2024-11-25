@@ -1,0 +1,31 @@
+{
+  "name": "philippoehrlein/kirby-navigation-groups",
+  "description": "A Kirby Plugin for grouping navigation items",
+  "type": "kirby-plugin",
+  "license": "MIT",
+  "version": "1.0.0",
+  "authors": [
+      {
+          "name": "Philipp Oehrlein",
+          "email": "github@philippoehrlein.de"
+      }
+  ],
+  "require": {
+      "php": ">=8.0",
+      "getkirby/composer-installer": "^1.2"
+  },
+  "autoload": {
+      "psr-4": {
+          "KirbyNavigationGroups\\": "src/classes/"
+      }
+  },
+  "config": {
+      "optimize-autoloader": true,
+    "allow-plugins": {
+      "getkirby/composer-installer": true
+    }
+  },
+  "extra": {
+      "kirby-cms-path": false
+  }
+}

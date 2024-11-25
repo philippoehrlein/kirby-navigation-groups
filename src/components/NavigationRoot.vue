@@ -25,6 +25,7 @@
         <GroupItem 
           v-if="item.type === 'group'" 
           :value="item" 
+          :fields="fields"
           @input="updateGroup(index, $event)"
           @edit="onGroupOption('edit', item)"
           @delete="onGroupOption('delete', item)"
@@ -57,6 +58,14 @@ export default {
     label: {
       type: String,
       required: true
+    },
+    fields: {
+      type: Object,
+      default: () => {}
+    },
+    status: {
+      type: String,
+      default: 'listed'
     }
   },
   data() {
@@ -68,32 +77,33 @@ export default {
   },
   methods: {
     openDialog(option, group) {
+      const fields = this.fields || {};
+      
       this.$panel.dialog.open({
-        component: 'k-form-dialog',
+        component: "k-form-dialog",
         props: {
-          fields: {
-            title: {
-              label: this.$t('field.navigationgroups.group.name'),
-              required: true,
-              type: 'text'
-            }
-          },
-          value: {
-            title: option === 'add' ? '' : group.text
+          fields,
+          value: option === "add" ? {} : {
+            title: group.title,
+            ...group
           }
         },
         on: {
           submit: (value) => {
-            if (option === 'add') {
-              this.$emit('input', [...this.value, {
+            if (option === "add") {
+              this.$emit("input", [...this.value, {
                 uuid: this.$helper.string.uuid(),
-                type: 'group',
-                text: value.title,
+                type: "group",
+                title: value.title,
+                ...value,
                 pages: []
               }]);
             } else {
-              this.$emit('input', this.value.map(item => 
-                item.uuid === group.uuid ? { ...item, text: value.title } : item
+              this.$emit("input", this.value.map(item => 
+                item.uuid === group.uuid ? {
+                  ...item,
+                  ...value
+                } : item
               ));
             }
             this.$panel.dialog.close();
@@ -138,7 +148,7 @@ export default {
       ));
     },
     async loadPages() {
-      const response = await this.$api.get(`navigation-groups/pages?path=${this.path}`);
+      const response = await this.$api.get(`navigation-groups/pages?path=${this.path}&status=${this.status}`);
       const newValue = [...this.value];
 
       for (let i = newValue.length - 1; i >= 0; i--) {
