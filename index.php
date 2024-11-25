@@ -41,44 +41,7 @@ Kirby::plugin('philippoehrlein/kirby-navigation-groups', [
       },
     ],
   ],
-  'api' => [
-    'routes' => [
-      [
-        'pattern' => 'navigation-groups/pages',
-        'method' => 'GET',
-        'action' => function () {
-          $path = get('path');
-          $status = get('status', 'listed');
-          
-          $parent = $path === 'site' 
-            ? site() 
-            : kirby()->page($path);
-
-          if (!$parent) {
-            return [];
-          }
-
-          $children = $parent->children()->$status();
-          
-          $result = [];
-          foreach ($children as $child) {
-            $image = $child->image();
-
-            $result[] = [
-              'id' => $child->id(),
-              'title' => $child->title()->value(),
-              'uuid' => $child->uuid()->value(),
-              'path' => $child->id(),
-              'status' => $child->status(),
-              'permissions' => $child->permissions(),
-              'image' => $image ? $image->url() : null
-            ];
-          }
-          return $result;
-        }
-      ]
-    ]
-  ],
+  'api' => require __DIR__ . '/config/api.php',
   'translations' => require __DIR__ . '/config/translations.php',
   'fieldMethods' => [
     'toGroupItems' => function ($field) {
