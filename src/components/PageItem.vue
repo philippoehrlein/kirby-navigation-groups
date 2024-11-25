@@ -4,11 +4,8 @@
     :sortable="item.sortable" 
     :text="item.text" 
     :link="'pages/' + item.path"
-    :image="{'back': 'pattern', color: 'gray-500', 'icon':'page'}"
+    :image="normalizedImage"
     class="k-draggable-item">
-    <template #drag>
-      <k-drag-handle v-if="item.sortable" />
-    </template>
     <template #options>
       <k-button 
         :icon="'status-' + item.flag.status" 
@@ -28,6 +25,35 @@ export default {
     item: {
       type: Object,
       required: true
+    },
+    image: {
+      type: Object,
+      default: () => ({
+        'back': 'pattern',
+        'color': 'gray-500',
+        'icon': 'page'
+      })
+    }
+  },
+  computed: {
+    normalizedImage() {
+      if(this.item.image) {
+        return {
+          src: this.item.image,
+          cover: true,
+          back: 'pattern',
+          ratio: '1/1',
+          ...this.image
+        }
+      } else {
+        return {
+          back: 'pattern',
+          color: 'gray-500',
+          icon: 'page',
+          ...this.image
+        }
+      }
+      
     }
   },
   methods: {
@@ -35,7 +61,6 @@ export default {
       this.$dialog(`pages/${item.path}/changeStatus`);
     },
     getIconColor(status) {
-      console.log(status);
       return status === 'listed' ? 'color: var(--color-green-500)' : 'color: var(--color-blue-500)';
     }
   }

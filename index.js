@@ -21,6 +21,34 @@
       item: {
         type: Object,
         required: true
+      },
+      image: {
+        type: Object,
+        default: () => ({
+          "back": "pattern",
+          "color": "gray-500",
+          "icon": "page"
+        })
+      }
+    },
+    computed: {
+      normalizedImage() {
+        if (this.item.image) {
+          return {
+            src: this.item.image,
+            cover: true,
+            back: "pattern",
+            ratio: "1/1",
+            ...this.image
+          };
+        } else {
+          return {
+            back: "pattern",
+            color: "gray-500",
+            icon: "page",
+            ...this.image
+          };
+        }
       }
     },
     methods: {
@@ -28,20 +56,17 @@
         this.$dialog(`pages/${item.path}/changeStatus`);
       },
       getIconColor(status) {
-        console.log(status);
         return status === "listed" ? "color: var(--color-green-500)" : "color: var(--color-blue-500)";
       }
     }
   };
   var _sfc_render$2 = function render() {
     var _vm = this, _c = _vm._self._c;
-    return _vm.item.type === "page" ? _c("k-item", { staticClass: "k-draggable-item", attrs: { "sortable": _vm.item.sortable, "text": _vm.item.text, "link": "pages/" + _vm.item.path, "image": { "back": "pattern", color: "gray-500", "icon": "page" } }, scopedSlots: _vm._u([{ key: "drag", fn: function() {
-      return [_vm.item.sortable ? _c("k-drag-handle") : _vm._e()];
-    }, proxy: true }, { key: "options", fn: function() {
+    return _vm.item.type === "page" ? _c("k-item", { staticClass: "k-draggable-item", attrs: { "sortable": _vm.item.sortable, "text": _vm.item.text, "link": "pages/" + _vm.item.path, "image": _vm.normalizedImage }, scopedSlots: _vm._u([{ key: "options", fn: function() {
       return [_c("k-button", { staticClass: "k-button k-status-icon", style: _vm.getIconColor(_vm.item.flag.status), attrs: { "icon": "status-" + _vm.item.flag.status, "data-type": "status-" + _vm.item.flag.status, "data-theme": _vm.item.flag.status === "listed" ? "positive-icon" : "info-icon" }, on: { "click": function($event) {
         return _vm.handleStatusClick(_vm.item);
       } } })];
-    }, proxy: true }], null, false, 2125919631) }) : _vm._e();
+    }, proxy: true }], null, false, 2481318459) }) : _vm._e();
   };
   var _sfc_staticRenderFns$2 = [];
   _sfc_render$2._withStripped = true;
@@ -68,6 +93,10 @@
       fields: {
         type: Object,
         default: () => ({})
+      },
+      image: {
+        type: Object,
+        default: () => ({})
       }
     },
     data() {
@@ -85,17 +114,25 @@
       },
       onGroupOption(action) {
         this.$emit(action);
+      },
+      toggleGroup() {
+        this.$emit("input", {
+          ...this.value,
+          open: !this.value.open
+        });
       }
     }
   };
   var _sfc_render$1 = function render() {
     var _vm = this, _c = _vm._self._c;
-    return _c("div", { staticClass: "k-navigation-group" }, [_c("header", { staticClass: "k-navigation-group-header" }, [_c("div", { staticClass: "k-navigation-group-header-title" }, [_c("button", { staticClass: "k-button k-sort-handle k-sort-button k-item-sort-handle", attrs: { "data-has-icon": "true", "aria-label": _vm.$t("field.navigationgroups.group.sort"), "title": _vm.$t("field.navigationgroups.group.sort"), "type": "button", "tabindex": "-1" } }, [_c("span", { staticClass: "k-button-icon" }, [_c("svg", { staticClass: "k-icon", attrs: { "aria-hidden": "true", "data-type": "sort" } }, [_c("use", { attrs: { "xlink:href": "#icon-sort" } })])])]), _c("h3", [_vm._v(_vm._s(_vm.value.title))])]), _c("div", { staticClass: "k-navigation-group-header-options" }, [_c("k-options-dropdown", { attrs: { "options": [
+    return _c("div", { staticClass: "k-navigation-group" }, [_c("button", { staticClass: "k-button k-sort-handle k-sort-button k-item-sort-handle", attrs: { "data-has-icon": "true", "aria-label": _vm.$t("field.navigationgroups.group.sort"), "title": _vm.$t("field.navigationgroups.group.sort"), "type": "button", "tabindex": "-1" } }, [_c("span", { staticClass: "k-button-icon" }, [_c("svg", { staticClass: "k-icon", attrs: { "aria-hidden": "true", "data-type": "sort" } }, [_c("use", { attrs: { "xlink:href": "#icon-sort" } })])])]), _c("header", { staticClass: "k-navigation-group-header" }, [_c("div", { staticClass: "k-navigation-group-header-title" }, [_c("k-button", { attrs: { "variant": "ghost", "icon": _vm.value.open ? "angle-down" : "angle-right", "title": _vm.$t(_vm.value.open ? "field.navigationgroups.closeGroup" : "field.navigationgroups.openGroup") }, on: { "click": _vm.toggleGroup } }), _c("h3", [_vm._v(_vm._s(_vm.value.title))])], 1), _c("div", { staticClass: "k-navigation-group-header-options", on: { "mousedown": function($event) {
+      $event.stopPropagation();
+    } } }, [_c("k-options-dropdown", { attrs: { "options": [
       { text: _vm.$t("edit"), icon: "edit", click: "edit" },
       { text: _vm.$t("delete"), icon: "trash", click: "delete" }
     ] }, on: { "action": function($event) {
       return _vm.onGroupOption($event);
-    } } })], 1)]), _c("k-draggable", { ref: "groupDraggable", staticClass: "k-draggable-group", class: { "k-empty": !_vm.value.pages.length }, attrs: { "list": _vm.value.pages, "options": {
+    } } })], 1)]), _vm.value.open ? _c("k-draggable", { ref: "groupDraggable", staticClass: "k-draggable-group", class: { "k-empty": !_vm.value.pages.length }, attrs: { "list": _vm.value.pages, "handle": ".k-item-sort-handle", "options": {
       group: {
         name: "pages",
         pull: true,
@@ -107,8 +144,8 @@
       },
       animation: 150
     } }, on: { "change": _vm.onDragChange } }, _vm._l(_vm.value.pages, function(page) {
-      return _c("k-box", { key: page.id }, [_c("PageItem", { attrs: { "item": page } })], 1);
-    }), 1), _c("footer", { staticClass: "k-navigation-group-footer" })], 1);
+      return _c("k-box", { key: page.id }, [_c("PageItem", { attrs: { "item": page, "image": _vm.image } })], 1);
+    }), 1) : _vm._e(), _c("footer", { staticClass: "k-navigation-group-footer" })], 1);
   };
   var _sfc_staticRenderFns$1 = [];
   _sfc_render$1._withStripped = true;
@@ -141,6 +178,10 @@
         type: String,
         required: true
       },
+      image: {
+        type: Object,
+        default: () => ({})
+      },
       fields: {
         type: Object,
         default: () => {
@@ -157,6 +198,25 @@
         draggedElement: null,
         isDragging: false
       };
+    },
+    computed: {
+      groupStats() {
+        const groups = this.value.filter((item) => item.type === "group");
+        const openCount = groups.filter((group) => group.open).length;
+        const totalCount = groups.length;
+        return {
+          openCount,
+          closedCount: totalCount - openCount,
+          totalCount,
+          shouldClose: openCount >= totalCount / 2
+        };
+      },
+      toggleAllIcon() {
+        return this.groupStats.shouldClose ? "angle-down" : "angle-right";
+      },
+      toggleAllTooltip() {
+        return this.groupStats.shouldClose ? this.$t("field.navigationgroups.closeAll") : this.$t("field.navigationgroups.openAll");
+      }
     },
     methods: {
       openDialog(option, group) {
@@ -177,6 +237,7 @@
                   uuid: this.$helper.string.uuid(),
                   type: "group",
                   title: value.title,
+                  open: true,
                   ...value,
                   pages: []
                 }]);
@@ -230,19 +291,50 @@
         ));
       },
       async loadPages() {
-        const response = await this.$api.get(`navigation-groups/pages?path=${this.path}&status=${this.status}`);
+        var _a;
+        const path = this.path === void 0 ? "site" : this.path;
+        const response = await this.$api.get(`navigation-groups/pages?path=${path}&status=${this.status}`);
         const newValue = [...this.value];
         for (let i = newValue.length - 1; i >= 0; i--) {
           const item = newValue[i];
           if (item.type === "page") {
-            const pageExists = response.some((page) => page.id === item.id);
-            if (!pageExists) {
+            const matchingPage = response.find((page) => page.id === item.id);
+            if (!matchingPage) {
               newValue.splice(i, 1);
+            } else {
+              newValue[i] = {
+                ...item,
+                text: matchingPage.title,
+                path: matchingPage.path.replace("/", "+"),
+                image: matchingPage.image || null,
+                flag: {
+                  status: matchingPage.status,
+                  icon: "icon-status-" + matchingPage.status,
+                  disabled: !((_a = matchingPage.permissions) == null ? void 0 : _a.changeStatus),
+                  statusId: matchingPage.id
+                }
+              };
             }
           } else if (item.type === "group" && item.pages.length) {
-            item.pages = item.pages.filter(
-              (page) => response.some((availablePage) => availablePage.id === page.id)
-            );
+            item.pages = item.pages.map((page) => {
+              var _a2;
+              const matchingPage = response.find((p) => p.id === page.id);
+              if (matchingPage) {
+                return {
+                  ...page,
+                  text: matchingPage.title,
+                  path: matchingPage.path.replace("/", "+"),
+                  image: matchingPage.image || null,
+                  flag: {
+                    status: matchingPage.status,
+                    icon: "icon-status-" + matchingPage.status,
+                    disabled: !((_a2 = matchingPage.permissions) == null ? void 0 : _a2.changeStatus),
+                    statusId: matchingPage.id
+                  }
+                };
+              }
+              return null;
+            }).filter(Boolean);
           }
         }
         const existingPageIds = new Set(
@@ -251,7 +343,7 @@
           )
         );
         const newPages = response.filter((page) => !existingPageIds.has(page.id)).map((page) => {
-          var _a;
+          var _a2;
           return {
             type: "page",
             id: page.id,
@@ -259,10 +351,11 @@
             text: page.title,
             uuid: page.uuid,
             sortable: true,
+            image: page.image || null,
             flag: {
               status: page.status,
               icon: "icon-status-" + page.status,
-              disabled: !((_a = page.permissions) == null ? void 0 : _a.changeStatus),
+              disabled: !((_a2 = page.permissions) == null ? void 0 : _a2.changeStatus),
               statusId: page.id
             }
           };
@@ -275,7 +368,7 @@
         const newValue = [...this.value];
         newValue[index] = {
           ...newValue[index],
-          pages: updatedGroup.pages
+          ...updatedGroup
         };
         this.$emit("input", newValue);
       },
@@ -303,6 +396,18 @@
           }
         }
         this.$emit("input", newValue);
+      },
+      toggleAll() {
+        const newValue = this.value.map((item) => {
+          if (item.type === "group") {
+            return {
+              ...item,
+              open: !this.groupStats.shouldClose
+            };
+          }
+          return item;
+        });
+        this.$emit("input", newValue);
       }
     },
     created() {
@@ -311,7 +416,7 @@
   };
   var _sfc_render = function render() {
     var _vm = this, _c = _vm._self._c;
-    return _c("section", { staticClass: "k-section" }, [_c("header", { staticClass: "k-section-header" }, [_c("h2", { staticClass: "k-label k-section-label" }, [_c("span", { staticClass: "k-label-text" }, [_vm._v(_vm._s(_vm.label))])]), _c("div", { staticClass: "k-button-group k-section-buttons" }, [_c("k-button", { attrs: { "variant": "filled", "size": "xs", "icon": "addgroup" }, on: { "click": _vm.addGroup } })], 1)]), !_vm.value.length ? _c("k-empty", { attrs: { "icon": "page", "text": _vm.$t("pages.empty") } }) : _vm._e(), _c("k-draggable", { staticClass: "k-draggable-container", attrs: { "list": _vm.value, "options": {
+    return _c("section", { staticClass: "k-section" }, [_c("header", { staticClass: "k-section-header" }, [_c("h2", { staticClass: "k-label k-section-label" }, [_c("span", { staticClass: "k-label-text" }, [_vm._v(_vm._s(_vm.label))])]), _c("div", { staticClass: "k-button-group k-section-buttons" }, [_c("k-button", { attrs: { "variant": "filled", "size": "xs", "icon": _vm.toggleAllIcon, "title": _vm.toggleAllTooltip }, on: { "click": _vm.toggleAll } }), _c("k-button", { attrs: { "variant": "filled", "size": "xs", "icon": "addgroup", "title": _vm.$t("field.navigationgroups.addGroup") }, on: { "click": _vm.addGroup } })], 1)]), !_vm.value.length ? _c("k-empty", { attrs: { "icon": "page", "text": _vm.$t("pages.empty") } }) : _vm._e(), _c("k-draggable", { staticClass: "k-draggable-container", attrs: { "list": _vm.value, "handle": ".k-item-sort-handle", "options": {
       group: {
         name: "pages",
         pull: true,
@@ -319,13 +424,13 @@
       },
       animation: 150
     } }, on: { "change": _vm.onDragChange } }, _vm._l(_vm.value, function(item, index) {
-      return _c("k-box", { key: item.id }, [item.type === "group" ? _c("GroupItem", { attrs: { "value": item, "fields": _vm.fields }, on: { "input": function($event) {
+      return _c("k-box", { key: item.id }, [item.type === "group" ? _c("GroupItem", { attrs: { "value": item, "fields": _vm.fields, "image": _vm.image }, on: { "input": function($event) {
         return _vm.updateGroup(index, $event);
       }, "edit": function($event) {
         return _vm.onGroupOption("edit", item);
       }, "delete": function($event) {
         return _vm.onGroupOption("delete", item);
-      } } }) : _c("PageItem", { attrs: { "item": item } })], 1);
+      } } }) : _c("PageItem", { attrs: { "item": item, "image": _vm.image } })], 1);
     }), 1)], 1);
   };
   var _sfc_staticRenderFns = [];

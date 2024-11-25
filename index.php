@@ -21,6 +21,9 @@ Kirby::plugin('philippoehrlein/kirby-navigation-groups', [
         'status' => function ($status = null) {
           return $status ?? 'listed';
         },
+        'image' => function ($image = null) {
+          return $image ?? [];
+        },
         'fields' => function ($fields = null) {
           $defaultFields = [
             'title' => [
@@ -46,18 +49,29 @@ Kirby::plugin('philippoehrlein/kirby-navigation-groups', [
         'action' => function () {
           $path = get('path');
           $status = get('status', 'listed');
-          $page = kirby()->page($path);
-          $children = $page->children()->$status();
+          
+          $parent = $path === 'site' 
+            ? site() 
+            : kirby()->page($path);
+
+          if (!$parent) {
+            return [];
+          }
+
+          $children = $parent->children()->$status();
           
           $result = [];
           foreach ($children as $child) {
+            $image = $child->image();
+
             $result[] = [
               'id' => $child->id(),
               'title' => $child->title()->value(),
               'uuid' => $child->uuid()->value(),
               'path' => $child->id(),
               'status' => $child->status(),
-              'permissions' => $child->permissions()
+              'permissions' => $child->permissions(),
+              'image' => $image ? $image->url() : null
             ];
           }
           return $result;

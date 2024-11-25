@@ -1,24 +1,25 @@
 <template>
   <div class="k-navigation-group">
+    <button 
+      data-has-icon="true" 
+      :aria-label="$t('field.navigationgroups.group.sort')" 
+      :title="$t('field.navigationgroups.group.sort')" 
+      type="button" 
+      class="k-button k-sort-handle k-sort-button k-item-sort-handle" 
+      tabindex="-1"
+    >
+      <span class="k-button-icon">
+        <svg aria-hidden="true" data-type="sort" class="k-icon">
+          <use xlink:href="#icon-sort"></use>
+        </svg>
+      </span>
+    </button>
     <header class="k-navigation-group-header">
       <div class="k-navigation-group-header-title">
-        <button 
-          data-has-icon="true" 
-          :aria-label="$t('field.navigationgroups.group.sort')" 
-          :title="$t('field.navigationgroups.group.sort')" 
-          type="button" 
-          class="k-button k-sort-handle k-sort-button k-item-sort-handle" 
-          tabindex="-1"
-        >
-          <span class="k-button-icon">
-            <svg aria-hidden="true" data-type="sort" class="k-icon">
-              <use xlink:href="#icon-sort"></use>
-            </svg>
-          </span>
-        </button>
+        <k-button variant="ghost" :icon="value.open ? 'angle-down' : 'angle-right'" :title="$t(value.open ? 'field.navigationgroups.closeGroup' : 'field.navigationgroups.openGroup')" @click="toggleGroup" />
         <h3>{{ value.title }}</h3>
       </div>
-      <div class="k-navigation-group-header-options">
+      <div class="k-navigation-group-header-options" @mousedown.stop>
         <k-options-dropdown 
           :options="[
             { text: $t('edit'), icon: 'edit', click: 'edit' }, 
@@ -30,8 +31,10 @@
     </header>
     <k-draggable 
       ref="groupDraggable"
+      v-if="value.open"
       :list="value.pages" 
       :class="{ 'k-empty': !value.pages.length }"
+      handle=".k-item-sort-handle"
       :options="{ 
         group: { 
           name: 'pages',
@@ -53,7 +56,7 @@
       class="k-draggable-group"
       @change="onDragChange">
       <k-box v-for="page in value.pages" :key="page.id">
-        <PageItem :item="page" />
+        <PageItem :item="page" :image="image" />
       </k-box>
     </k-draggable>
     <footer class="k-navigation-group-footer">
@@ -78,6 +81,10 @@ export default {
     fields: {
       type: Object,
       default: () => ({})
+    },
+    image: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -95,6 +102,12 @@ export default {
     },
     onGroupOption(action) {
       this.$emit(action);
+    },
+    toggleGroup() {
+      this.$emit('input', {
+        ...this.value,
+        open: !this.value.open
+      });
     }
   }
 }
@@ -106,12 +119,25 @@ export default {
   background-color: var(--color-white);
   border-radius: var(--rounded-md);
   box-shadow: var(--shadow);
+  position: relative;
+}
+.k-item-sort-handle {
+  position: absolute;
+  top: 0;
+  left: -28px;
+  top: 4px;
+  opacity: 0;
+  transition: opacity 0s ease-in-out 0.15s;
+}
+.k-navigation-group:hover .k-item-sort-handle {
+  opacity: 1;
 }
 .k-navigation-group-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--color-gray-200);
+  padding: 0 var(--spacing-1);
   height: var(--height-xl);
 }
 .k-navigation-group-header h3 {
@@ -126,6 +152,7 @@ export default {
   display: flex;
   align-items: center;
   overflow: hidden;
+  padding: var(--spacing-2) 0;
   gap: var(--spacing-2);
 }
 .k-navigation-group-footer {

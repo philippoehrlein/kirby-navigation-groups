@@ -5,13 +5,15 @@
         <span class="k-label-text">{{ label }}</span>
       </h2>
       <div class="k-button-group k-section-buttons">
-        <k-button variant="filled" size="xs" icon="addgroup" @click="addGroup" />
+        <k-button variant="filled" size="xs" :icon="toggleAllIcon" :title="toggleAllTooltip" @click="toggleAll" />
+        <k-button variant="filled" size="xs" icon="addgroup" :title="$t('field.navigationgroups.addGroup')" @click="addGroup" />
       </div>
     </header>
     <k-empty v-if="!value.length" icon="page" :text="$t('pages.empty')" />
     <k-draggable
       :list="value"
       class="k-draggable-container"
+      handle=".k-item-sort-handle"
       :options="{ 
         group: {
           name: 'pages',
@@ -26,11 +28,12 @@
           v-if="item.type === 'group'" 
           :value="item" 
           :fields="fields"
+          :image="image"
           @input="updateGroup(index, $event)"
           @edit="onGroupOption('edit', item)"
           @delete="onGroupOption('delete', item)"
         /> 
-        <PageItem v-else :item="item" />
+        <PageItem v-else :item="item" :image="image" />
       </k-box>
     </k-draggable>
   </section>
@@ -59,6 +62,10 @@ export default {
       type: String,
       required: true
     },
+    image: {
+      type: Object,
+      default: () => ({})
+    },
     fields: {
       type: Object,
       default: () => {}
@@ -74,6 +81,30 @@ export default {
       draggedElement: null,
       isDragging: false
     };
+  },
+  computed: {
+    groupStats() {
+      const groups = this.value.filter(item => item.type === 'group');
+      const openCount = groups.filter(group => group.open).length;
+      const totalCount = groups.length;
+      
+      return {
+        openCount,
+        closedCount: totalCount - openCount,
+        totalCount,
+        shouldClose: openCount >= totalCount / 2
+      };
+    },
+
+    toggleAllIcon() {
+      return this.groupStats.shouldClose ? 'angle-down' : 'angle-right';
+    },
+
+    toggleAllTooltip() {
+      return this.groupStats.shouldClose 
+        ? this.$t('field.navigationgroups.closeAll') 
+        : this.$t('field.navigationgroups.openAll');
+    }
   },
   methods: {
     openDialog(option, group) {
@@ -95,6 +126,7 @@ export default {
                 uuid: this.$helper.string.uuid(),
                 type: "group",
                 title: value.title,
+                open: true,
                 ...value,
                 pages: []
               }]);
@@ -137,9 +169,9 @@ export default {
         this.$emit('input', [
           ...this.value.filter(item => item.uuid !== group.uuid),
           ...group.pages.map(page => ({
-          type: 'page',
-          ...page
-        }))
+            type: 'page',
+            ...page
+          }))
         ]);
         return;
       } 
@@ -148,25 +180,53 @@ export default {
       ));
     },
     async loadPages() {
-      const response = await this.$api.get(`navigation-groups/pages?path=${this.path}&status=${this.status}`);
+      const path = this.path === undefined ? 'site' : this.path;
+      const response = await this.$api.get(`navigation-groups/pages?path=${path}&status=${this.status}`);
       const newValue = [...this.value];
 
       for (let i = newValue.length - 1; i >= 0; i--) {
         const item = newValue[i];
 
         if (item.type === 'page') {
-          const pageExists = response.some(page => page.id === item.id);
-          if (!pageExists) {
+          const matchingPage = response.find(page => page.id === item.id);
+          if (!matchingPage) {
             newValue.splice(i, 1);
+          } else {
+            newValue[i] = {
+              ...item,
+              text: matchingPage.title,
+              path: matchingPage.path.replace('/', '+'),
+              image: matchingPage.image || null,
+              flag: {
+                status: matchingPage.status,
+                icon: 'icon-status-' + matchingPage.status,
+                disabled: !matchingPage.permissions?.changeStatus,
+                statusId: matchingPage.id
+              }
+            };
           }
         } else if (item.type === 'group' && item.pages.length) {
-          item.pages = item.pages.filter(page =>
-            response.some(availablePage => availablePage.id === page.id)
-          );
+          item.pages = item.pages.map(page => {
+            const matchingPage = response.find(p => p.id === page.id);
+            if (matchingPage) {
+              return {
+                ...page,
+                text: matchingPage.title,
+                path: matchingPage.path.replace('/', '+'),
+                image: matchingPage.image || null,
+                flag: {
+                  status: matchingPage.status,
+                  icon: 'icon-status-' + matchingPage.status,
+                  disabled: !matchingPage.permissions?.changeStatus,
+                  statusId: matchingPage.id
+                }
+              };
+            }
+            return null;
+          }).filter(Boolean);
         }
       }
 
-      // Füge neue Seiten hinzu
       const existingPageIds = new Set(
         newValue.flatMap(item =>
           item.type === 'page'
@@ -184,6 +244,7 @@ export default {
           text: page.title,
           uuid: page.uuid,
           sortable: true,
+          image: page.image || null,
           flag: {
             status: page.status,
             icon: 'icon-status-' + page.status,
@@ -200,7 +261,7 @@ export default {
       const newValue = [...this.value];
       newValue[index] = {
         ...newValue[index],
-        pages: updatedGroup.pages
+        ...updatedGroup
       };
       this.$emit('input', newValue);
     },
@@ -238,6 +299,19 @@ export default {
         }
       }
 
+      this.$emit('input', newValue);
+    },
+    toggleAll() {
+      const newValue = this.value.map(item => {
+        if (item.type === 'group') {
+          return {
+            ...item,
+            open: !this.groupStats.shouldClose
+          };
+        }
+        return item;
+      });
+      
       this.$emit('input', newValue);
     }
   },
