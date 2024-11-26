@@ -8,7 +8,6 @@ return [
       'action' => function () {
         $path = get('path');
         $status = get('status', 'listed');
-
         $status_values = ['all', 'listed', 'unlisted', 'published'];
 
         $status = $status === 'all' ? 'published' : $status;

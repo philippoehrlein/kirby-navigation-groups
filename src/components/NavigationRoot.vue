@@ -195,8 +195,7 @@ export default {
       ));
     },
     async loadPages() {
-      console.log('loadPages');
-      const path = this.path === '/' ? 'site' : this.path;
+      const path = this.path === undefined ? 'site' : this.path;
       const response = await this.$api.get(`navigation-groups/pages?path=${path}&status=${this.status}`);
       const newValue = [...this.value];
 
