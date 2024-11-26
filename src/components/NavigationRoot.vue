@@ -82,6 +82,15 @@ export default {
       isDragging: false
     };
   },
+  created() {
+    this.loadPages();
+  },
+  mounted() {
+		this.$events.on("page.changeStatus", this.loadPages);
+	},
+	destroyed() {
+		this.$events.off("page.changeStatus", this.loadPages);
+	},
   computed: {
     groupStats() {
       const groups = this.value.filter(item => item.type === 'group');
@@ -186,6 +195,7 @@ export default {
       ));
     },
     async loadPages() {
+      console.log('loadPages');
       const path = this.path === '/' ? 'site' : this.path;
       const response = await this.$api.get(`navigation-groups/pages?path=${path}&status=${this.status}`);
       const newValue = [...this.value];
@@ -289,9 +299,6 @@ export default {
       
       this.$emit('input', newValue);
     }
-  },
-  created() {
-    this.loadPages();
   }
 };
 </script>
