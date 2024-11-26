@@ -61,7 +61,7 @@ fields:
 
 The plugin supports the following options:
 
-- `status`: Filter for page status ('all', 'listed', 'unlisted', default: 'listed')
+- `status`: Filter for page status ('all', 'listed', 'unlisted', 'published', default: 'listed')
 - `fields`: Additional fields for groups
 
 
