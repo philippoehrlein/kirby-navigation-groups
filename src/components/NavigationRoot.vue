@@ -22,7 +22,7 @@
         },
         animation: 150
       }"
-      @change="onDragChange">
+      @change="onRootChange">
       <k-box v-for="(item, index) in value" :key="item.id">
         <GroupItem 
           v-if="item.type === 'group'" 
@@ -146,6 +146,9 @@ export default {
     addGroup() {
       this.openDialog('add');
     },
+    onRootChange(evt) {
+      this.$emit('input', this.value);
+    },
     onGroupOption(option, group) {
       if (option === 'edit') {
         this.openDialog('edit', group);
@@ -162,25 +165,28 @@ export default {
             }
           }
         })
-      }
+      } 
     },
     deleteGroup(group) {
       if(group.pages.length) {
-        this.$emit('input', [
-          ...this.value.filter(item => item.uuid !== group.uuid),
-          ...group.pages.map(page => ({
-            type: 'page',
-            ...page
-          }))
-        ]);
+        const newValue = [...this.value];
+        const groupIndex = newValue.findIndex(item => item.uuid === group.uuid);
+        
+        newValue.splice(groupIndex, 1, ...group.pages.map(page => ({
+          type: 'page',
+          ...page
+        })));
+        
+        this.$emit('input', newValue);
         return;
       } 
+      
       this.$emit('input', this.value.filter(item => 
         item.uuid !== group.uuid ? item : null
       ));
     },
     async loadPages() {
-      const path = this.path === undefined ? 'site' : this.path;
+      const path = this.path === '/' ? 'site' : this.path;
       const response = await this.$api.get(`navigation-groups/pages?path=${path}&status=${this.status}`);
       const newValue = [...this.value];
 
@@ -259,46 +265,15 @@ export default {
     },
     updateGroup(index, updatedGroup) {
       const newValue = [...this.value];
-      newValue[index] = {
-        ...newValue[index],
-        ...updatedGroup
-      };
-      this.$emit('input', newValue);
-    },
-    onDragChange(evt) {
-      if (evt.from === evt.to) {
-        this.$emit('input', this.value);
-        return;
+      const groupIndex = newValue.findIndex(item => item.uuid === updatedGroup.uuid);
+      
+      if (groupIndex !== -1) {
+        newValue[groupIndex] = {
+          ...newValue[groupIndex],
+          ...updatedGroup
+        };
       }
-
-      const movedItem = evt.item.__vue__.$props.item;
-      const newValue = [...this.value];
-
-      if (!evt.from.classList.contains('k-draggable-group') && 
-          evt.to.classList.contains('k-draggable-group')) {
-        
-        // Finde die Zielgruppe
-        const targetGroupIndex = newValue.findIndex(item => 
-          item.type === 'group' && 
-          item.pages === evt.to.__vue__.$props.list
-        );
-
-        if (targetGroupIndex !== -1) {
-          // Entferne das Element aus Root
-          const rootItemIndex = newValue.findIndex(item => item.uuid === movedItem.uuid);
-          if (rootItemIndex !== -1) {
-            newValue.splice(rootItemIndex, 1);
-          }
-
-          // Füge das Element zur Zielgruppe hinzu
-          const pageItem = {
-            type: 'page',
-            ...movedItem
-          };
-          newValue[targetGroupIndex].pages.splice(evt.newIndex, 0, pageItem);
-        }
-      }
-
+      
       this.$emit('input', newValue);
     },
     toggleAll() {

@@ -95,10 +95,13 @@ export default {
   },
   methods: {
     onDragChange(evt) {
-      this.$emit('input', {
+
+      const updatedGroup = {
         ...this.value,
         pages: this.value.pages
-      });
+      };
+      
+      this.$emit('input', updatedGroup);
     },
     onGroupOption(action) {
       this.$emit(action);

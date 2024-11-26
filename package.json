@@ -1,5 +1,13 @@
 {
   "type": "module",
+  "name": "kirby-navigation-groups",
+  "version": "1.0.0",
+  "author": {
+    "name": "Philipp Oehrlein",
+    "email": "github@philippoehrlein.de"
+  },
+  "description": "A Kirby Plugin for grouping navigation items",
+  "license": "MIT",
   "scripts": {
     "dev": "npx kirbyup src/index.js --watch",
     "serve": "npx kirbyup serve src/index.js",
