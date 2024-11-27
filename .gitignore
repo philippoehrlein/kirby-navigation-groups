@@ -24,7 +24,6 @@ Thumbs.db
 # Composer
 composer.phar
 /vendor/
-composer.lock
 .php-cs-fixer.cache
 
 # Sicherungsdateien
