@@ -66,11 +66,11 @@ The plugin supports the following options:
 
 
 ## Field Methods
-The plugin provides a Field Method to access the navigation groups:
+The plugin provides the Field Method `toGroupItems()` to access the stored navigation items:
 
 ```php
 <?php
-$items = $page->sidebarnavigation()->toGroupItems();
+$items = $page->navigation()->toGroupItems();
 ?>
 
 <nav class="navigation">
