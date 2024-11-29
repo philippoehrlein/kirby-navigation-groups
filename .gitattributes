@@ -11,3 +11,4 @@ kirbyup.config.js export-ignore
 package-lock.json export-ignore
 package.json export-ignore
 composer.lock export-ignore
+kirbyup.config.js export-ignore
