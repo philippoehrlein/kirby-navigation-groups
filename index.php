@@ -61,5 +61,5 @@ Kirby::plugin('philippoehrlein/kirby-navigation-groups', [
       return $items;
     }
   ],
-  'version' => '1.0.2'
+  'version' => '1.0.3'
 ]);

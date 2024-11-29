@@ -1,6 +1,6 @@
 # Kirby Navigation Groups
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.0.2-blue)
+![Version](https://img.shields.io/badge/version-1.0.3-blue)
 
 A plugin for Kirby CMS that allows you to organize your navigation items into groups.
 
