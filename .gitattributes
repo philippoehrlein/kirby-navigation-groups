@@ -5,7 +5,6 @@
 
 # Source Files
 src/ export-ignore
-kirbyup.config.js export-ignore
 
 # Development Files
 package-lock.json export-ignore

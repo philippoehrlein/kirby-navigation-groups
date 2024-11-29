@@ -6,6 +6,5 @@ panel.plugin('philippoehrlein/kirby-navigation-groups', {
   },
   fields: {
       navigationgroups: NavigationRoot
-    }
-  });
-  
+  }
+});

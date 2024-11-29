@@ -3,7 +3,7 @@
   "description": "A Kirby Plugin for grouping navigation items",
   "type": "kirby-plugin",
   "license": "MIT",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "homepage": "https://github.com/philippoehrlein/kirby-navigation-groups",
   "authors": [
       {
