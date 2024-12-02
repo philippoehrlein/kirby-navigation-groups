@@ -8,5 +8,5 @@ Kirby::plugin('philippoehrlein/kirby-navigation-groups', [
   'api' => require __DIR__ . '/config/api.php',
   'translations' => require __DIR__ . '/config/translations.php',
   'fieldMethods' => require __DIR__ . '/config/fieldMethods.php',
-  'version' => '1.0.4'
+  'version' => '1.0.5'
 ]);
