@@ -225,7 +225,7 @@ export default {
           item.pages = item.pages.map(page => {
             const matchingPage = response.find(p => p.id === page.id);
             if (matchingPage) {
-              const newPath = matchingPage.path.replace('/', '+');
+              const newPath = matchingPage.path.replace(/\//g, '+');
               return {
                 ...page,
                 text: matchingPage.title,

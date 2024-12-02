@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "kirby-navigation-groups",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": {
     "name": "Philipp Oehrlein",
     "email": "github@philippoehrlein.de"
