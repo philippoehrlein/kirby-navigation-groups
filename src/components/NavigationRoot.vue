@@ -195,8 +195,9 @@ export default {
       ));
     },
     async loadPages() {
-      const path = this.path === undefined ? 'site' : this.path;
+      const path = this.path === undefined ? 'site' : this.path;      
       const response = await this.$api.get(`navigation-groups/pages?path=${path}&status=${this.status}`);
+
       const newValue = [...this.value];
 
       for (let i = newValue.length - 1; i >= 0; i--) {
@@ -210,7 +211,7 @@ export default {
             newValue[i] = {
               ...item,
               text: matchingPage.title,
-              path: matchingPage.path.replace('/', '+'),
+              path: matchingPage.path.replace(/\//g, '+'),
               image: matchingPage.image || null,
               flag: {
                 status: matchingPage.status,
@@ -224,10 +225,11 @@ export default {
           item.pages = item.pages.map(page => {
             const matchingPage = response.find(p => p.id === page.id);
             if (matchingPage) {
+              const newPath = matchingPage.path.replace('/', '+');
               return {
                 ...page,
                 text: matchingPage.title,
-                path: matchingPage.path.replace('/', '+'),
+                path: newPath,
                 image: matchingPage.image || null,
                 flag: {
                   status: matchingPage.status,
@@ -255,7 +257,7 @@ export default {
         .map(page => ({
           type: 'page',
           id: page.id,
-          path: page.path.replace('/', '+'),
+          path: page.path.replace(/\//g, '+'),
           text: page.title,
           uuid: page.uuid,
           sortable: true,

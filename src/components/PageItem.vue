@@ -2,7 +2,7 @@
   <k-item 
     v-if="item.type === 'page'"
     :sortable="item.sortable" 
-    :text="item.text" 
+    :text="item.text + item.path" 
     :link="'pages/' + item.path"
     :image="normalizedImage"
     class="k-draggable-item">
