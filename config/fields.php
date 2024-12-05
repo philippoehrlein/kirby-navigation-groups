@@ -33,6 +33,27 @@ return [
       }
     ],
     'save' => function ($value = null) {
+      if ($value) {
+        $sortedPages = [];
+        foreach ($value as $item) {
+          if ($item['type'] === 'page') {
+            $sortedPages[] = $item['id'];
+          } else if ($item['type'] === 'group' && isset($item['pages'])) {
+            foreach ($item['pages'] as $page) {
+              $sortedPages[] = $page['id'];
+            }
+          }
+        }
+
+        foreach ($sortedPages as $index => $pageId) {
+          if ($page = page($pageId)) {
+            if ($page->isWritable()) {
+              $page->changeSort($index + 1);
+            }
+          }
+        }
+      }
+
       return Yaml::encode($value);
     },
   ],
