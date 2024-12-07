@@ -1,6 +1,8 @@
 <?php
 
 use Kirby\Data\Yaml;
+
+require_once __DIR__ . '/../lib/Group.php';
 use KirbyNavigationGroups\Group;
 
 return [

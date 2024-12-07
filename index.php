@@ -1,6 +1,4 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php';
-
 use Kirby\Cms\App as Kirby;
 
 Kirby::plugin('philippoehrlein/kirby-navigation-groups', [
@@ -8,5 +6,5 @@ Kirby::plugin('philippoehrlein/kirby-navigation-groups', [
   'api' => require __DIR__ . '/config/api.php',
   'translations' => require __DIR__ . '/config/translations.php',
   'fieldMethods' => require __DIR__ . '/config/fieldMethods.php',
-  'version' => '1.1.0'
+  'version' => '1.1.1'
 ]);
