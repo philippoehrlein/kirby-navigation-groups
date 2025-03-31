@@ -271,7 +271,6 @@ export default {
         }));
       newValue.push(...newPages);
 
-      this.$emit('input', newValue);
       this.pages = response;
     },
     updateGroup(index, updatedGroup) {
