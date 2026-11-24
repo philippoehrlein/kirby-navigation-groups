@@ -1,6 +1,6 @@
 # Kirby Navigation Groups
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.1.2-blue)
+![Version](https://img.shields.io/badge/version-1.1.3-blue)
 
 A plugin for Kirby CMS that allows you to organize your navigation items into groups.
 
@@ -96,11 +96,28 @@ $items = $page->navigation()->toGroupItems();
 
 ## Development
 
-If you want to contribute to the development of this plugin, follow these steps:
+From the plugin repository root, install and start the local playground:
 
-1. Clone the repository.
-2. Install dependencies using Composer.
-3. Make your changes and test them in your Kirby installation.
+```sh
+composer --working-dir=playground install
+composer dev
+```
+
+Open [the test page](http://localhost:8000/) to see the rendered navigation.
+On first use, create a local administrator at [the Panel](http://localhost:8000/panel), then open
+[the test page in the Panel](http://localhost:8000/panel/pages/test).
+
+The test page includes two listed children in a group, an unlisted standalone
+child, an empty group and a draft. Drag a published child between groups or
+change its status in the Panel, save, then reload the frontend to check the
+result. The Navigation field includes listed and unlisted children. The draft
+appears in the Pages section.
+
+The playground installs Kirby from its own Composer lockfile and loads the
+plugin and its built Panel assets from the current checkout. After editing
+Panel source files, run `npm ci` and `npm run build` from the plugin root.
+Panel accounts and runtime files are local. Changes saved to the sample pages
+modify the tracked files under `playground/content`.
 
 ## License
 

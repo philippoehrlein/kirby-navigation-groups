@@ -119,8 +119,9 @@ export default {
 <style scoped>
 .k-navigation-group {
   width: 100%;
-  background-color: var(--color-white);
+  background-color: var(--item-color-back);
   border-radius: var(--rounded-md);
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow);
   position: relative;
 }
@@ -139,7 +140,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid var(--color-border);
   padding: 0 var(--spacing-1);
   height: var(--height-xl);
 }
@@ -159,7 +160,7 @@ export default {
   gap: var(--spacing-2);
 }
 .k-navigation-group-footer {
-  border-top: 1px solid var(--color-gray-200);
+  border-top: 1px solid var(--color-border);
   padding: var(--spacing-1);
 }
 .k-draggable-group {
@@ -167,11 +168,11 @@ export default {
   flex-direction: column;
   gap: 2px;
   width: 100%;
-  background-color: var(--color-gray-100);
+  background-color: var(--panel-color-back);
   padding: var(--spacing-2) var(--spacing-1);
 }
 .k-empty {
   height: 40px;
-  background-color: var(--color-gray-100);
+  background-color: var(--panel-color-back);
 }
 </style>

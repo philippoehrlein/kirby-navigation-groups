@@ -23,7 +23,7 @@
         animation: 150
       }"
       @change="onRootChange">
-      <k-box v-for="(item, index) in value" :key="item.id">
+      <k-box v-for="(item, index) in value" :key="item.uuid || item.id">
         <GroupItem 
           v-if="item.type === 'group'" 
           :value="item" 
@@ -195,10 +195,10 @@ export default {
       ));
     },
     async loadPages() {
-      const path = this.path === undefined ? 'site' : this.path;      
+      console.log('loadPages');
+      const path = this.path === undefined ? 'site' : this.path;
       const response = await this.$api.get(`navigation-groups/pages?path=${path}&status=${this.status}`);
-
-      const newValue = [...this.value];
+      const newValue = this.value.map(item => ({ ...item }));
 
       for (let i = newValue.length - 1; i >= 0; i--) {
         const item = newValue[i];
@@ -221,26 +221,28 @@ export default {
               }
             };
           }
-        } else if (item.type === 'group' && item.pages.length) {
-          item.pages = item.pages.map(page => {
-            const matchingPage = response.find(p => p.id === page.id);
-            if (matchingPage) {
-              const newPath = matchingPage.path.replace(/\//g, '+');
-              return {
-                ...page,
-                text: matchingPage.title,
-                path: newPath,
-                image: matchingPage.image || null,
-                flag: {
-                  status: matchingPage.status,
-                  icon: 'icon-status-' + matchingPage.status,
-                  disabled: !matchingPage.permissions?.changeStatus,
-                  statusId: matchingPage.id
-                }
-              };
-            }
-            return null;
-          }).filter(Boolean);
+        } else if (item.type === 'group' && item.pages && item.pages.length) {
+          const updatedPages = item.pages
+            .map(page => {
+              const matchingPage = response.find(p => p.id === page.id);
+              if (matchingPage) {
+                return {
+                  ...page,
+                  text: matchingPage.title,
+                  path: matchingPage.path.replace(/\//g, '+'),
+                  image: matchingPage.image || null,
+                  flag: {
+                    status: matchingPage.status,
+                    icon: 'icon-status-' + matchingPage.status,
+                    disabled: !matchingPage.permissions?.changeStatus,
+                    statusId: matchingPage.id
+                  }
+                };
+              }
+              return null;
+            })
+            .filter(Boolean);
+          newValue[i] = { ...item, pages: updatedPages };
         }
       }
 
@@ -248,7 +250,7 @@ export default {
         newValue.flatMap(item =>
           item.type === 'page'
             ? [item.id]
-            : item.pages.map(page => page.id)
+            : (item.pages || []).map(page => page.id)
         )
       );
 
@@ -272,6 +274,7 @@ export default {
       newValue.push(...newPages);
 
       this.pages = response;
+      this.$emit('input', newValue);
     },
     updateGroup(index, updatedGroup) {
       const newValue = [...this.value];

@@ -1,0 +1,20 @@
+title: Test
+
+template: test
+
+icon: 🧪
+
+columns:
+  pages:
+    width: 1/2
+    sections:
+      pages:
+        sortable: true
+        type: pages
+  test:
+    width: 1/2
+    fields:
+      navigation:
+        label: Navigation
+        type: navigationgroups
+        status: all

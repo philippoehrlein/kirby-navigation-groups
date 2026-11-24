@@ -75,8 +75,4 @@ export default {
 .k-status-icon {
   --icon-size: 15px;
 }
-
-.k-frame.k-icon-frame.k-item-image svg {
-  color: var(--color-grey-500);
-}
 </style>

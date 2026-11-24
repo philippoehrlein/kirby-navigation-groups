@@ -40,3 +40,11 @@ config.local.php
 # Test Coverage
 /tests/coverage/
 .phpunit.result.cache
+
+# Playground runtime
+/playground/vendor/
+/playground/public/media/
+/playground/site/accounts/
+/playground/site/cache/
+/playground/site/logs/
+/playground/site/sessions/

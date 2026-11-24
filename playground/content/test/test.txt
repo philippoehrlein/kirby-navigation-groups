@@ -1,0 +1,61 @@
+Title: Navigation Groups Test
+
+----
+
+Navigation:
+
+- 
+  uuid: 6f8fb1a5-e932-4973-b8b4-d30c5f216935
+  type: group
+  title: Grouped pages
+  open: true
+  pages:
+    - 
+      type: page
+      id: test/test-page-1
+      path: test+test-page-1
+      text: Test Page 1
+      uuid: test/test-page-1
+      sortable: true
+      image: null
+      flag:
+        status: listed
+        icon: icon-status-listed
+        disabled: true
+        statusId: test/test-page-1
+    - 
+      type: page
+      id: test/test-page-2
+      path: test+test-page-2
+      text: Test Page 2
+      uuid: test/test-page-2
+      sortable: true
+      image: null
+      flag:
+        status: listed
+        icon: icon-status-listed
+        disabled: true
+        statusId: test/test-page-2
+- 
+  uuid: 9ba778f1-efbd-4721-b659-900beb1e551a
+  type: group
+  title: Empty group
+  open: true
+  pages: [ ]
+- 
+  type: page
+  id: test/standalone
+  path: test+standalone
+  text: Standalone page
+  uuid: ngdemoStandalone
+  sortable: true
+  flag:
+    status: listed
+    icon: icon-status-listed
+    disabled: true
+    statusId: test/standalone
+  image: null
+
+----
+
+Uuid: lrpcjevd4ustw6gf

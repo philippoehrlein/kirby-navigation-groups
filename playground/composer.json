@@ -1,0 +1,21 @@
+{
+  "name": "philippoehrlein/kirby-navigation-groups-playground",
+  "description": "Local Kirby playground for Navigation Groups",
+  "require": {
+    "getkirby/cms": "5.6.4"
+  },
+  "config": {
+    "allow-plugins": {
+      "getkirby/composer-installer": true
+    }
+  },
+  "extra": {
+    "kirby-cms-path": false
+  },
+  "scripts": {
+    "start": [
+      "Composer\\Config::disableProcessTimeout",
+      "@php -S localhost:8000 -t public vendor/getkirby/cms/router.php"
+    ]
+  }
+}
