@@ -10,7 +10,8 @@ return [
     $value = $field->value();
     $data = Yaml::decode($value);
 
-    $customFields = $field->fields()->toArray();
+    $definition = $field->parent()?->blueprint()->field($field->key());
+    $customFields = (array)($definition['fields'] ?? []);
 
     $items = array_map(function ($item) use ($customFields) {
       if ($item['type'] === 'group') {

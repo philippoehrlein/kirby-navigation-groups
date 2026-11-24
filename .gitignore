@@ -33,6 +33,9 @@ composer.phar
 
 # Build-Verzeichnis
 /dist/
+/index.dev.css
+/index.dev.js
+/index.dev.mjs
 
 # Lokale Konfigurationsdateien
 config.local.php

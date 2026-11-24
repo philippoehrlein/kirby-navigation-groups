@@ -39,7 +39,8 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount, useApi, useApp, useHelpers, usePanel } from 'kirbyuse';
+import { useApi, useHelpers, usePanel, usePanelEvent } from 'kirbyuse';
+import { computed } from 'vue';
 import PageItem from './PageItem.vue';
 import GroupItem from './GroupItem.vue';
 
@@ -74,7 +75,6 @@ const emit = defineEmits(['input']);
 const panel = usePanel();
 const api = useApi();
 const helpers = useHelpers();
-const events = useApp().$events;
 
 const shouldClose = computed(() => {
   const groups = props.value.filter(item => item.type === 'group');
@@ -279,12 +279,7 @@ function toggleAll() {
   emit('input', newValue);
 }
 
-onMounted(() => {
-  events.on('page.changeStatus', loadPages);
-});
-onBeforeUnmount(() => {
-  events.off('page.changeStatus', loadPages);
-});
+usePanelEvent('page.changeStatus', loadPages);
 loadPages();
 </script>
 

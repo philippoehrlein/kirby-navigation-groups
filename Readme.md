@@ -1,6 +1,6 @@
 # Kirby Navigation Groups
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.1.4-blue)
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
 
 A plugin for Kirby CMS that allows you to organize your navigation items into groups.
 
@@ -16,6 +16,11 @@ A plugin for Kirby CMS that allows you to organize your navigation items into gr
 
 ## Installation
 
+Version 2 requires Kirby 6.0.0 or later and PHP 8.3 or later.
+
+For Kirby 4 and 5, use [version 1.1.4](https://github.com/philippoehrlein/kirby-navigation-groups/releases/tag/v1.1.4).
+The [support/kirby-4-5 branch](https://github.com/philippoehrlein/kirby-navigation-groups/tree/support/kirby-4-5) tracks that release line.
+
 ### Download
 
 Download and copy this repository to `/site/plugins/kirby-navigation-groups`
@@ -23,6 +28,12 @@ Download and copy this repository to `/site/plugins/kirby-navigation-groups`
 ### Composer
 ``` bash
 composer require philippoehrlein/kirby-navigation-groups
+```
+
+For Kirby 4 and 5:
+
+```sh
+composer require philippoehrlein/kirby-navigation-groups:^1.1
 ```
 
 ## Usage
@@ -107,7 +118,7 @@ Open [the test page](http://localhost:8000/) to see the rendered navigation.
 On first use, create a local administrator at [the Panel](http://localhost:8000/panel), then open
 [the test page in the Panel](http://localhost:8000/panel/pages/test).
 
-The test page includes two listed children in a group, an unlisted standalone
+The test page includes two listed children in a group, a standalone
 child, an empty group and a draft. Drag a published child between groups or
 change its status in the Panel, save, then reload the frontend to check the
 result. The Navigation field includes listed and unlisted children. The draft

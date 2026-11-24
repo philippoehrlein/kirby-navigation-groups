@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "kirby-navigation-groups",
-  "version": "1.1.4",
+  "version": "2.0.0",
   "author": {
     "name": "Philipp Oehrlein",
     "email": "github@philippoehrlein.de"
@@ -9,17 +9,13 @@
   "description": "A Kirby Plugin for grouping navigation items",
   "license": "MIT",
   "scripts": {
-    "dev": "npx kirbyup src/index.js --watch",
-    "serve": "npx kirbyup serve src/index.js",
-    "build": "npx kirbyup src/index.js"
+    "dev": "kirbyup dev src/index.js",
+    "serve": "kirbyup dev src/index.js",
+    "build": "kirbyup build src/index.js"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.4",
-    "kirbyup": "^3.5.0",
-    "kirbyuse": "^1.4.2",
-    "vite": "^6.4.6"
-  },
-  "dependencies": {
-    "vue": "^3.5.13"
+    "kirbyup": "4.0.0-beta.2",
+    "kirbyuse": "2.0.0-beta.7",
+    "vue": "^3.5.46"
   }
 }

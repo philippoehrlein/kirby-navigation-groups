@@ -2,7 +2,7 @@
   "name": "philippoehrlein/kirby-navigation-groups-playground",
   "description": "Local Kirby playground for Navigation Groups",
   "require": {
-    "getkirby/cms": "5.6.4"
+    "getkirby/cms": "6.0.0"
   },
   "config": {
     "allow-plugins": {

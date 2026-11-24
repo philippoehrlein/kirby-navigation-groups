@@ -19,7 +19,8 @@
 </template>
 
 <script setup>
-import { computed, useApp } from 'kirbyuse';
+import { usePanel } from 'kirbyuse';
+import { computed } from 'vue';
 
 const props = defineProps({
   item: {
@@ -36,7 +37,7 @@ const props = defineProps({
   }
 });
 
-const app = useApp();
+const panel = usePanel();
 const normalizedImage = computed(() => ({
   ...(props.item.image
     ? { src: props.item.image, cover: true, back: 'pattern', ratio: '1/1' }
@@ -45,7 +46,7 @@ const normalizedImage = computed(() => ({
 }));
 
 function handleStatusClick(item) {
-  app.$dialog(`pages/${item.path}/changeStatus`);
+  panel.dialog.open(`pages/${item.path}/changeStatus`);
 }
 
 function getIconColor(status) {
