@@ -39,23 +39,13 @@
         group: { 
           name: 'pages',
           pull: true,
-          put: (to, from, dragEl) => {
-            const isPageItem = dragEl.__vue__ && 
-              dragEl.__vue__.$children[0] && 
-              dragEl.__vue__.$children[0].$options.name === 'NavigationPageItem';
-            
-            const isGroup = dragEl.__vue__ && 
-              dragEl.__vue__.$children[0] && 
-              dragEl.__vue__.$children[0].$options.name === 'NavigationGroup';
-            
-            return isPageItem && !isGroup;
-          }
+          put: acceptsPage
         },
         animation: 150
       }"
       class="k-draggable-group"
       @change="onDragChange">
-      <k-box v-for="page in value.pages" :key="page.id">
+      <k-box v-for="page in value.pages" :key="page.id" data-navigation-item="page">
         <PageItem :item="page" :image="image" />
       </k-box>
     </k-draggable>
@@ -65,54 +55,38 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import PageItem from './PageItem.vue';
 
-export default {
-  name: 'NavigationGroup',
-  components: {
-    PageItem
+const props = defineProps({
+  value: {
+    type: Object,
+    required: true
   },
-  props: {
-    value: {
-      type: Object,
-      required: true
-    },
-    fields: {
-      type: Object,
-      default: () => ({})
-    },
-    image: {
-      type: Object,
-      default: () => ({})
-    }
-  },
-  data() {
-    return {
-      draggedElement: null,
-      isDragging: false
-    }
-  },
-  methods: {
-    onDragChange(evt) {
-
-      const updatedGroup = {
-        ...this.value,
-        pages: this.value.pages
-      };
-      
-      this.$emit('input', updatedGroup);
-    },
-    onGroupOption(action) {
-      this.$emit(action);
-    },
-    toggleGroup() {
-      this.$emit('input', {
-        ...this.value,
-        open: !this.value.open
-      });
-    }
+  image: {
+    type: Object,
+    default: () => ({})
   }
+});
+const emit = defineEmits(['input', 'edit', 'delete']);
+
+function acceptsPage(to, from, draggedElement) {
+  return draggedElement.dataset.navigationItem === 'page';
+}
+
+function onDragChange() {
+  emit('input', { ...props.value });
+}
+
+function onGroupOption(action) {
+  emit(action);
+}
+
+function toggleGroup() {
+  emit('input', {
+    ...props.value,
+    open: !props.value.open
+  });
 }
 </script>
 

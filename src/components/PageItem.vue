@@ -18,52 +18,38 @@
   </k-item>
 </template>
 
-<script>
-export default {
-  name: 'NavigationPageItem',
-  props: {
-    item: {
-      type: Object,
-      required: true
-    },
-    image: {
-      type: Object,
-      default: () => ({
-        'back': 'pattern',
-        'color': 'gray-500',
-        'icon': 'page'
-      })
-    }
+<script setup>
+import { computed, useApp } from 'kirbyuse';
+
+const props = defineProps({
+  item: {
+    type: Object,
+    required: true
   },
-  computed: {
-    normalizedImage() {
-      if(this.item.image) {
-        return {
-          src: this.item.image,
-          cover: true,
-          back: 'pattern',
-          ratio: '1/1',
-          ...this.image
-        }
-      } else {
-        return {
-          back: 'pattern',
-          color: 'gray-500',
-          icon: 'page',
-          ...this.image
-        }
-      }
-      
-    }
-  },
-  methods: {
-    handleStatusClick(item) {
-      this.$dialog(`pages/${item.path}/changeStatus`);
-    },
-    getIconColor(status) {
-      return status === 'listed' ? 'color: var(--color-green-500)' : 'color: var(--color-blue-500)';
-    }
+  image: {
+    type: Object,
+    default: () => ({
+      back: 'pattern',
+      color: 'gray-500',
+      icon: 'page'
+    })
   }
+});
+
+const app = useApp();
+const normalizedImage = computed(() => ({
+  ...(props.item.image
+    ? { src: props.item.image, cover: true, back: 'pattern', ratio: '1/1' }
+    : { back: 'pattern', color: 'gray-500', icon: 'page' }),
+  ...props.image
+}));
+
+function handleStatusClick(item) {
+  app.$dialog(`pages/${item.path}/changeStatus`);
+}
+
+function getIconColor(status) {
+  return status === 'listed' ? 'color: var(--color-green-500)' : 'color: var(--color-blue-500)';
 }
 </script>
 
